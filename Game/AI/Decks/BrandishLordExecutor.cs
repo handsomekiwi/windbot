@@ -78,14 +78,15 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.MaxxC, MaxxCEffect);
             AddExecutor(ExecutorType.Activate, CardId.WidowAnchor, WidowAnchorEffect);
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence,DefaultInfiniteImpermanence);            
-            AddExecutor(ExecutorType.Activate, CardId.TwinTwisters, TwinTwistersEffect);
+            AddExecutor(ExecutorType.Activate, CardId.TwinTwisters, TwinTwistersEffect);//need
             //AddExecutor(ExecutorType.Activate, CardId.EffectVeiler, DefaultBreakthroughSkill);
             //AddExecutor(ExecutorType.Activate, CardId.SolemnWarning, DefaultSolemnWarning);
             //AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);
             AddExecutor(ExecutorType.Activate, CardId.MultiRoll, MultiRollfirst);
             //first set
-            AddExecutor(ExecutorType.SpellSet, SpellSetFirst);
-            AddExecutor(ExecutorType.Activate, ResourceRestart);
+            AddExecutor(ExecutorType.SpellSet, SpellHerculesBaseFirst);
+            AddExecutor(ExecutorType.Activate, ResourceRestart1);
+            AddExecutor(ExecutorType.Activate, ResourceRestart2);
             AddExecutor(ExecutorType.Activate, CardId.MultiRoll, MultiRollEffectFirst);
             //restart resource
             AddExecutor(ExecutorType.Activate, CardId.HerculesBase, HerculesBaseEffect);
@@ -223,7 +224,7 @@ namespace WindBot.Game.AI.Decks
         }
         private bool MultiRollfirst()
         {
-            return Card.Location == CardLocation.Hand;
+            return Card.Location == CardLocation.Hand && !Bot.HasInSpellZone(CardId.MultiRoll);
         }
 
 
@@ -708,18 +709,31 @@ namespace WindBot.Game.AI.Decks
             return true;
         }
 
-        private bool SpellSetFirst()
+        private bool SpellHerculesBaseFirst()
         {
             if(Card.Id==CardId.HerculesBase && (!AreaZero_used || !MultiRoll_used))
             return true;
             return false;
         }
 
-        private bool ResourceRestart()
+        private bool ResourceRestart1()
         {
-            if(Card.Id==CardId.AreaZero || Card.Id==CardId.MultiRoll)
+            if(Card.Id==CardId.AreaZero)
             {
                 if(Bot.HasInSpellZone(CardId.HerculesBase))
+                {
+                    AI.SelectCard(CardId.HerculesBase);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool ResourceRestart2()
+        {
+            if (Card.Id==CardId.MultiRoll)
+            {
+                if (Bot.HasInSpellZone(CardId.HerculesBase))
                 {
                     AI.SelectCard(CardId.HerculesBase);
                     return true;
