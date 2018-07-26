@@ -301,14 +301,17 @@ namespace WindBot.Game.AI
 
         public ClientCard GetBestEnemyCard(bool onlyFaceup = false, bool canBeTarget = false)
         {
-            ClientCard card = GetBestEnemyMonster(onlyFaceup, canBeTarget);
+            
+            ClientCard card = GetProblematicEnemyCard(0, canBeTarget);
+            if (card != null && card != IsUnffectCardWithCondition(canBeTarget))
+                return card;
+            card = GetBestEnemyMonster(onlyFaceup, canBeTarget);
             if (card != null && card != IsUnffectCardWithCondition(canBeTarget))
                 return card;
 
             card = GetBestEnemySpell(onlyFaceup);
             if (card != null && card != IsUnffectCardWithCondition(canBeTarget))
                 return card;
-
             return null;
         }
 
@@ -357,14 +360,21 @@ namespace WindBot.Game.AI
                 return card;
 
             List<ClientCard> spells = Enemy.GetSpells();
-
+            
             foreach (ClientCard ecard in spells)
             {
                 if (ecard.IsFaceup() && ecard.HasType(CardType.Continuous)||
                     ecard.IsFaceup() && ecard.HasType(CardType.Field))
                     return ecard;
             }
-
+            if (GetPZone(1, 0) != null && GetPZone(1, 0).Type == 16777218)
+            {
+                return GetPZone(1, 0);
+            }
+            if (GetPZone(1, 1) != null && GetPZone(1, 1).Type == 16777218)
+            {
+                return GetPZone(1, 1);
+            }
             if (spells.Count > 0 && !onlyFaceup)
                 return spells[0];
 

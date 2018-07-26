@@ -42,7 +42,10 @@ namespace WindBot.Game
         public bool IsLastAttacker { get; set; }      
         public bool SpSummon { get; set; }
         public int[] ActionIndex { get; set; }
-        public IDictionary<int, int> ActionActivateIndex { get; private set; }      
+        public IDictionary<int, int> ActionActivateIndex { get; private set; }
+        //public ClientCard EquipTarget { get; set; }      
+        public IList<ClientCard> EquipTarget = new List<ClientCard>();
+        //public List<ClientCard> EquipTarget { get; set; }
         public ClientCard(int id, CardLocation loc)
             : this(id, loc, 0, 0)
         {
@@ -56,8 +59,7 @@ namespace WindBot.Game
             ActionIndex = new int[16];
             ActionActivateIndex = new Dictionary<int, int>();
             Location = loc;
-            Zone = zone;
-            SpSummon = false;
+            Zone = zone;            
         }
 
         public void SetId(int id)
@@ -67,13 +69,7 @@ namespace WindBot.Game
             Data = NamedCard.Get(Id);
             if (Data != null)
                 Name = Data.Name;
-        }
-
-        public void UpdateSpSummon()
-        {
-           SpSummon= true;
-        }
-
+        }        
 
         public void Update(BinaryReader packet, Duel duel)
         {
@@ -173,6 +169,7 @@ namespace WindBot.Game
         {
             return ((Attribute & (int)attribute) != 0);
         }
+        
 
         public bool IsMonster()
         {
@@ -228,12 +225,17 @@ namespace WindBot.Game
         {
             if (!IsMonster())
                 return false;
-            return SpSummon;
-        }
+            return SpSummon || IsExtraCard() || HasType(CardType.Ritual);
+        }        
 
         public bool IsEquiped(int id)
-        {
-            return true;
+        {            
+            foreach(ClientCard check in EquipTarget)
+            {
+                if (check.Id == id)
+                    return true;
+            }
+            return false;
         }
 
         public bool HasXyzMaterial()

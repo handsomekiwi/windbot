@@ -58,7 +58,7 @@ namespace WindBot.Game.AI.Decks
             public const int SecurityDragon = 99111753;
             public const int LinkSpider = 98978921;
             public const int Linkuriboh = 41999284;*/
-
+            public const int GraveCall = 24224830;
             public const int HarpiesFeatherDuster = 18144506;
             public const int ElShaddollWinda = 94977269;
             public const int DarkHole = 53129443;
@@ -89,7 +89,7 @@ namespace WindBot.Game.AI.Decks
         {
             //counter
             AddExecutor(ExecutorType.Activate, CardId.SolemnStrike, SolemnStrikeeff);
-            AddExecutor(ExecutorType.Activate, CardId.AshBlossom, ChainEnemy);
+            AddExecutor(ExecutorType.Activate, CardId.AshBlossom, DefaultAshBlossomAndJoyousSpring);
             AddExecutor(ExecutorType.Activate, CardId.CrystalWingSynchroDragon, CrystalWingSynchroDragoneff);
             AddExecutor(ExecutorType.Activate, CardId.MaxxC, MaxxCeff);
             //AddExecutor(ExecutorType.Activate, CardId.Scapegoat,Scapegoateff);
@@ -157,6 +157,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.SpSummon, CardId.ApprenticeWitchling, ApprenticeWitchlingsp);
             AddExecutor(ExecutorType.Activate, CardId.ApprenticeWitchling, ApprenticeWitchlingeff);
             AddExecutor(ExecutorType.SpSummon, CardId.VentriloauistsClaraAndLucika, VentriloauistsClaraAndLucikasp);
+            AddExecutor(ExecutorType.Summon, CardId.WindwitchSnowBell, WindwitchSnowBellsummon);
             AddExecutor(ExecutorType.Repos, MonsterRepos);
         }
         private void EternalSoulSelect()
@@ -233,6 +234,7 @@ namespace WindBot.Game.AI.Decks
         bool big_attack = false;
         bool big_attack_used = false;
         bool CrystalWingSynchroDragon_used = false;
+        ClientCard Calltarget = null;
         public override void OnNewPhase()
         {
             //AI.Utils.UpdateLinkedZone();
@@ -499,14 +501,7 @@ namespace WindBot.Game.AI.Decks
                 return true;
             return false;
         }
-
-        private bool ChainEnemy()
-        {
-            if (AI.Utils.GetLastChainCard() != null &&
-                AI.Utils.GetLastChainCard().Id == CardId.UpstartGoblin)
-                return false;
-            return Duel.LastChainPlayer == 1;
-        }
+       
 
         private bool CrystalWingSynchroDragoneff()
         {
@@ -661,7 +656,12 @@ namespace WindBot.Game.AI.Decks
                     return true;
                 }
             }
-
+            if(Calltarget!=null && (Calltarget.Id==CardId.DarkMagician || Calltarget.Id==CardId.DarkMagicianTheDragonKnight) && !soul_used)
+                {
+                soul_used = true;
+                AI.SelectCard(Calltarget);
+                return true;
+            }
             if (Enemy.HasInSpellZone(CardId.DarkHole) && Card.IsFacedown() &&
                 (Bot.HasInMonstersZone(CardId.DarkMagician) || Bot.HasInMonstersZone(CardId.DarkMagicianTheDragonKnight)))
             {
@@ -671,6 +671,7 @@ namespace WindBot.Game.AI.Decks
             if (Bot.HasInGraveyard(CardId.DarkMagicianTheDragonKnight) &&
                 !Bot.HasInMonstersZone(CardId.DarkMagicianTheDragonKnight) && !plan_C)
             {
+                soul_used = true;
                 EternalSoulSelect();
                 AI.SelectCard(CardId.DarkMagicianTheDragonKnight);
                 return true;
@@ -809,6 +810,7 @@ namespace WindBot.Game.AI.Decks
             if (AI.Utils.IsChainTarget(Card))
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
+                AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectCard(CardId.DarkMagician);
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
@@ -827,6 +829,7 @@ namespace WindBot.Game.AI.Decks
             if (DefaultOnBecomeTarget() && !soul_faceup)
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
+                AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectCard(CardId.DarkMagician);
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
@@ -844,6 +847,7 @@ namespace WindBot.Game.AI.Decks
             }
             if (Duel.Player == 0 && Card.Location == CardLocation.SpellZone && !maxxc_used && Bot.HasInHand(CardId.DarkMagician))
             {
+                AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectCard(CardId.DarkMagician);
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
@@ -865,6 +869,7 @@ namespace WindBot.Game.AI.Decks
                 && Card.Location == CardLocation.SpellZone)
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
+                AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectCard(CardId.DarkMagician);
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
@@ -884,6 +889,7 @@ namespace WindBot.Game.AI.Decks
                 (Duel.Phase == DuelPhase.BattleStart || Duel.Phase == DuelPhase.End) &&
                 Card.Location == CardLocation.SpellZone && !maxxc_used)
             {
+                AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectCard(CardId.DarkMagician);
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
@@ -1082,7 +1088,7 @@ namespace WindBot.Game.AI.Decks
                 if (check.Id != CardId.CrystalWingSynchroDragon)
                     count++;
             }
-            Logger.DebugWriteLine("%%%%%%%%%%%%%%%%SpellCaster= " + count);
+            
             if (lockbird_used) return false;
             if (Bot.HasInSpellZone(CardId.LllusionMagic) && count < 2)
                 return false;
@@ -1090,13 +1096,15 @@ namespace WindBot.Game.AI.Decks
             if (Bot.HasInMonstersZone(CardId.SpellbookMagicianOfProphecy) ||
                 Bot.HasInMonstersZone(CardId.MagiciansRod) ||
                 Bot.HasInMonstersZone(CardId.WindwitchGlassBell) ||
-                Bot.HasInMonstersZone(CardId.WindwitchIceBell))
+                Bot.HasInMonstersZone(CardId.WindwitchIceBell) ||
+                Bot.HasInMonstersZone(CardId.WindwitchSnowBell))
             {
                 AI.SelectCard(new[]
                 {
                     CardId.SpellbookMagicianOfProphecy,
                     CardId.MagiciansRod,
                     CardId.WindwitchGlassBell,
+                    CardId.WindwitchSnowBell
                 });
                 return true;
             }
@@ -1122,8 +1130,7 @@ namespace WindBot.Game.AI.Decks
             {
                 if (check.Id != CardId.CrystalWingSynchroDragon)
                     count++;
-            }
-            Logger.DebugWriteLine("%%%%%%%%%%%%%%%%SpellCaster= " + count);
+            }            
             if (Card.Location == CardLocation.Hand)
             {
                 if (Bot.HasInSpellZone(CardId.LllusionMagic) && count < 2)
@@ -1132,7 +1139,8 @@ namespace WindBot.Game.AI.Decks
                 if (Bot.HasInMonstersZone(CardId.SpellbookMagicianOfProphecy) ||
                 Bot.HasInMonstersZone(CardId.MagiciansRod) ||
                 Bot.HasInMonstersZone(CardId.WindwitchGlassBell) ||
-                Bot.HasInMonstersZone(CardId.WindwitchIceBell))
+                Bot.HasInMonstersZone(CardId.WindwitchIceBell) ||
+                Bot.HasInMonstersZone(CardId.WindwitchSnowBell))
                 {
                     AI.SelectCard(new[]
                     {
@@ -1140,6 +1148,7 @@ namespace WindBot.Game.AI.Decks
                     CardId.MagiciansRod,
                     CardId.WindwitchGlassBell,
                     CardId.WindwitchIceBell,
+                    CardId.WindwitchSnowBell,
                 });
                     return UniqueFaceupSpell();
                 }
@@ -1572,6 +1581,16 @@ namespace WindBot.Game.AI.Decks
             }    
             return false;
         }
+
+        private bool WindwitchSnowBellsummon()
+        {
+            if(Bot.HasInHand(CardId.WonderWand)||Bot.HasInHand(CardId.SpellbookOfKnowledge))
+            {
+                if (Bot.GetMonsterCount() == 0)
+                    return true;                
+            }
+            return false;
+        }
         private bool BigEyesp()
         {
             if (plan_C) return false;
@@ -1689,15 +1708,13 @@ namespace WindBot.Game.AI.Decks
         }
         public override void OnChaining(int player, ClientCard card)
         {
-            
-           
-            base.OnChaining(player, card);
-            
+            base.OnChaining(player, card);            
         }
 
 
         public override void OnChainEnd()
         {
+            Calltarget = null;
             foreach (ClientCard check in Enemy.GetSpells())
             {
                 Logger.DebugWriteLine("card zone= " + check.Zone.ToString());
@@ -1948,6 +1965,14 @@ namespace WindBot.Game.AI.Decks
         }
         public bool MonsterRepos()
         {
+            if(Card.Id==CardId.CrystalWingSynchroDragon && Card.IsAttack())
+            {
+                foreach(ClientCard m in Enemy.GetMonsters())
+                {
+                    if (m.Level >= 5)
+                        return false;
+                }
+            }
             if (Bot.HasInMonstersZone(CardId.OddEyesWingDragon) || 
                 Bot.HasInSpellZone(CardId.OddEyesWingDragon) || 
                 Bot.HasInMonstersZone(CardId.OddEyesAbsoluteDragon))
@@ -1964,6 +1989,5 @@ namespace WindBot.Game.AI.Decks
                 return true;
             return base.DefaultMonsterRepos();
         }
-
     }
 }

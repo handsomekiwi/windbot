@@ -12,8 +12,7 @@
         YubelIncarnate = 4779091,
         YubelNightmare = 31764700,
         MaskedHeroDivineWind = 22093873,
-        DarknessNeosphere = 60417395,
-        MetaionTheTimelord = 74530899,
+        DarknessNeosphere = 60417395,        
         CastleGate = 36931229
     }
 }

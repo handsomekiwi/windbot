@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Net;
@@ -64,10 +65,20 @@ namespace WindBot
         }
 
         private static void RunFromArgs()
-        {
+        {                      
             WindBotInfo Info = new WindBotInfo();
             Info.Name = Config.GetString("Name", Info.Name);
-            Info.Deck = Config.GetString("Deck", Info.Deck);
+            Info.Ramdomdeck= Config.GetBool("Ramdomdeck", Info.Ramdomdeck);//kiwi randomdeck
+            if(Info.Ramdomdeck)
+            {
+                List<string> digits = new List<string> { "BrandishLord", "GrenMajuThunderBoarder",
+                "SkyStriker","DarkMagician","ChainBurn","LightswornShaddoldinosour","Trickstar","Zoodiac",
+                "Blue-Eyes","Dragunity","BlueEyesMaxDragon"};
+                Random rm = new Random();
+                Info.Deck = digits[rm.Next(digits.Count)];
+            }
+            else
+                Info.Deck = Config.GetString("Deck", Info.Deck);
             Info.Dialog = Config.GetString("Dialog", Info.Dialog);
             Info.Host = Config.GetString("Host", Info.Host);
             Info.Port = Config.GetInt("Port", Info.Port);
@@ -76,6 +87,7 @@ namespace WindBot
             Info.Hand = Config.GetInt("Hand", Info.Hand);
             Info.Debug = Config.GetBool("Debug", Info.Debug);
             Info.Chat = Config.GetBool("Chat", Info.Chat);
+            Info.ShowBotHand = Config.GetBool("ShowBotHand", Info.ShowBotHand);
             Run(Info);
         }
 
@@ -94,6 +106,8 @@ namespace WindBot
     try
     {
 #endif
+                   
+                    
                     HttpListenerContext ctx = MainServer.GetContext();
 
                     WindBotInfo Info = new WindBotInfo();
@@ -122,6 +136,9 @@ namespace WindBot
                     string chat = HttpUtility.ParseQueryString(RawUrl).Get("chat");
                     if (chat != null)
                         Info.Chat = bool.Parse(chat);
+                    string showbothand = HttpUtility.ParseQueryString(RawUrl).Get("showbothand");
+                    if (showbothand != null)
+                        Info.ShowBotHand = bool.Parse(showbothand);
 
                     if (Info.Name == null || Info.Host == null || port == null)
                     {
@@ -168,6 +185,7 @@ namespace WindBot
             GameClient client = new GameClient(Info);
             client.Start();
             Logger.DebugWriteLine(client.Username + " started.");
+
             while (client.Connection.IsConnected)
             {
 #if !DEBUG
@@ -184,6 +202,7 @@ namespace WindBot
         }
 #endif
             }
+            //Console.ReadLine();
             Logger.DebugWriteLine(client.Username + " end.");
 #if !DEBUG
     }

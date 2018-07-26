@@ -70,6 +70,7 @@ namespace WindBot.Game.AI
 
         public virtual BattlePhaseAction OnSelectAttackTarget(ClientCard attacker, IList<ClientCard> defenders)
         {
+           
             // Overrided in DefalultExecutor
             return null;
         }
@@ -102,7 +103,14 @@ namespace WindBot.Game.AI
         {
             // Some AI need do something on draw
         }
+        public virtual void OnMove()
+        {
+            // Some AI need do something on Move
+        }
+        public virtual void OnAttack()
+        {
 
+        }
         public virtual IList<ClientCard> OnSelectCard(IList<ClientCard> cards, int min, int max, int hint, bool cancelable)
         {
             // For overriding
@@ -165,6 +173,11 @@ namespace WindBot.Game.AI
         public virtual int OnSelectOption(IList<int> options)
         {
             return -1;
+        }
+        public virtual int OnSelectChain(IList<ClientCard> cards, IList<int> descs, bool forced)
+        {
+            // For overriding
+            return 0;
         }
 
         public virtual int OnSelectPlace(int cardId, int player, int location, int available)

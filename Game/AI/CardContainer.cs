@@ -13,7 +13,7 @@ namespace WindBot.Game.AI
             foreach (ClientCard card in cards)
             {
                 if (card == null || card.Data == null || card.IsFacedown() || (canBeTarget && card.IsShouldNotBeTarget())) continue;
-                if (card.HasType(CardType.Monster) && card.Attack > highestAtk)
+                if ((card.HasType(CardType.Monster) || card.HasType(CardType.TrapMonster)) && card.Attack > highestAtk)
                 {
                     highestAtk = card.Attack;
                     selected = card;
@@ -29,7 +29,7 @@ namespace WindBot.Game.AI
             foreach (ClientCard card in cards)
             {
                 if (card == null || card.Data == null || card.IsFacedown() || (canBeTarget && card.IsShouldNotBeTarget())) continue;
-                if (card.HasType(CardType.Monster) && card.Defense > highestDef)
+                if ((card.HasType(CardType.Monster) || card.HasType(CardType.TrapMonster)) && card.Defense > highestDef)
                 {
                     highestDef = card.Defense;
                     selected = card;
@@ -45,8 +45,8 @@ namespace WindBot.Game.AI
             foreach (ClientCard card in cards)
             {
                 if (card == null || card.Data == null || card.IsFacedown() || (canBeTarget && card.IsShouldNotBeTarget())) continue;
-                if (lowestAtk == 0 && card.HasType(CardType.Monster) ||
-                    card.HasType(CardType.Monster) && card.Attack < lowestAtk)
+                if (lowestAtk == 0 && (card.HasType(CardType.Monster) ||
+                    card.HasType(CardType.TrapMonster)) && card.Attack < lowestAtk)
                 {
                     lowestAtk = card.Attack;
                     selected = card;
@@ -62,8 +62,8 @@ namespace WindBot.Game.AI
             foreach (ClientCard card in cards)
             {
                 if (card == null || card.Data == null || card.IsFacedown() || (canBeTarget && card.IsShouldNotBeTarget())) continue;
-                if (lowestDef == 0 && card.HasType(CardType.Monster) ||
-                    card.HasType(CardType.Monster) && card.Defense < lowestDef)
+                if (lowestDef == 0 && (card.HasType(CardType.Monster) ||
+                    card.HasType(CardType.TrapMonster)) && card.Defense < lowestDef)
                 {
                     lowestDef = card.Defense;
                     selected = card;
@@ -129,7 +129,7 @@ namespace WindBot.Game.AI
             {
                 if (card == null)
                     continue;
-                if (card.HasType(CardType.Monster))
+                if (card.HasType(CardType.Monster) || card.HasType(CardType.TrapMonster))
                     cardlist.Add(card);
             }
             return cardlist;

@@ -79,6 +79,20 @@ namespace WindBot.Game
         }
 
         /// <summary>
+        /// Called when move a card
+        /// </summary>
+        public void OnMove()
+        {
+            Executor.OnMove();
+        }
+        /// <summary>
+        /// Called when announce attack
+        /// </summary>
+        public void OnAttack()
+        {
+            Executor.OnAttack();
+        }
+        /// <summary>
         /// Called when it's a new turn.
         /// </summary>
         public void OnNewTurn()
@@ -91,14 +105,14 @@ namespace WindBot.Game
         /// </summary>
         public void OnNewPhase()
         {
-            m_selector = null;
             m_nextSelector = null;
             m_thirdSelector = null;
             m_materialSelector = null;
             m_option = -1;
-            m_yesno = -1;
-            m_position = CardPosition.FaceUpAttack;
-            m_place = 0;
+            m_yesno = -1;           
+            m_selector.Clear();
+            m_position.Clear();
+            m_place.Clear();           
             if (Duel.Player == 0 && Duel.Phase == DuelPhase.Draw)
             {
                 _dialogs.SendNewTurn();
@@ -121,6 +135,22 @@ namespace WindBot.Game
         /// <param name="player">Player who is currently chaining.</param>
         public void OnChaining(ClientCard card, int player)
         {
+            int count = 0;
+            foreach (ClientCard m in Duel.CurrentChain)
+            {
+                if (card.Controller == 0)
+                    count++;
+            }
+            if (Duel.CurrentChain.Count == 1 && count > 1)
+            {                
+                CardSelector temp;
+                for (int i = 0; i < m_selector.Count / 2; i++)
+                {
+                    temp = m_selector[i];
+                    m_selector[i] = m_selector[m_selector.Count - 1 - i];
+                    m_selector[m_selector.Count - 1 - i] = temp;
+                }                
+            }               
             Executor.OnChaining(player,card);
         }
         
@@ -129,6 +159,9 @@ namespace WindBot.Game
         /// </summary>
         public void OnChainEnd()
         {
+            m_place.Clear();
+            m_position.Clear();
+            m_selector.Clear();
             Executor.OnChainEnd();
         }
 
@@ -139,7 +172,7 @@ namespace WindBot.Game
         /// <returns>A new BattlePhaseAction containing the action to do.</returns>
         public BattlePhaseAction OnSelectBattleCmd(BattlePhase battle)
         {
-            Logger.DebugWriteLine("OnSelectBattleCmd");
+            //Logger.DebugWriteLine("OnSelectBattleCmd");
             Executor.SetBattle(battle);           
             foreach (CardExecutor exec in Executor.Executors)
             {
@@ -243,7 +276,7 @@ namespace WindBot.Game
             {
                 if (m_materialSelector != null)
                 {
-                    //Logger.DebugWriteLine("m_materialSelector");
+                    Logger.DebugWriteLine("m_materialSelector");
                     selector = m_materialSelector;
                 }
                 else
@@ -388,6 +421,18 @@ namespace WindBot.Game
             Executor.SetMain(main);
             foreach (CardExecutor exec in Executor.Executors)
             {
+                if(exec.Type==ExecutorType.ToBattlePhase && ManualPhaseChange)
+                {
+                    ManualPhaseChange = false;
+                    if(Duel.Phase < DuelPhase.BattleStart && Duel.Player == 0)
+                        return new MainPhaseAction(MainPhaseAction.MainAction.ToBattlePhase);
+                }                    
+                if (exec.Type == ExecutorType.ToEndPhase && ManualPhaseChange)
+                {
+                    ManualPhaseChange = false;
+                    if(Duel.Phase < DuelPhase.End && Duel.Player == 0)
+                        return new MainPhaseAction(MainPhaseAction.MainAction.ToEndPhase);
+                }
                 for (int i = 0; i < main.ActivableCards.Count; ++i)
                 {
                     ClientCard card = main.ActivableCards[i];
@@ -446,11 +491,8 @@ namespace WindBot.Game
                         return new MainPhaseAction(MainPhaseAction.MainAction.SetSpell, card.ActionIndex);
                 }
             }
-
-            if (main.CanBattlePhase)
-                return new MainPhaseAction(MainPhaseAction.MainAction.ToBattlePhase);
-            if(Duel.Phase==DuelPhase.Main1)
-               // return new MainPhaseAction(MainPhaseAction.MainAction.ToMainPhaseTwo);
+            if (main.CanBattlePhase && Duel.Fields[0].HasAttackingMonster())
+                return new MainPhaseAction(MainPhaseAction.MainAction.ToBattlePhase);            
             _dialogs.SendEndTurn();
             return new MainPhaseAction(MainPhaseAction.MainAction.ToEndPhase); 
         }
@@ -473,9 +515,8 @@ namespace WindBot.Game
         }
 
         public int OnSelectPlace(int cardId, int player, int location, int available)
-        {            
-            int selector_selected = m_place;
-            m_place = 0;
+        {
+            int selector_selected = GetSelectedPlace();          
 
             int executor_selected = Executor.OnSelectPlace(cardId, player, location, available);
 
@@ -497,14 +538,19 @@ namespace WindBot.Game
         /// <returns>Selected position.</returns>
         public CardPosition OnSelectPosition(int cardId, IList<CardPosition> positions)
         {
-            CardPosition selector_selected = m_position;
-            m_position = CardPosition.FaceUpAttack;
-
+            CardPosition selector_selected = GetSelectedPosition();
+            /*if (selector_selected == 0)
+            {
+                m_position = CardPosition.FaceUpAttack;
+                selector_selected = m_position;
+            }*/
+            
             CardPosition executor_selected = Executor.OnSelectPosition(cardId, positions);
-
+            
             // Selects the selected position if available, the first available otherwise.
             if (positions.Contains(executor_selected))
                 return executor_selected;
+            
             if (positions.Contains(selector_selected))
                 return selector_selected;
 
@@ -727,96 +773,101 @@ namespace WindBot.Game
 
         // _ Others functions _
         // Those functions are used by the AI behavior.
-
-        private CardSelector m_selector;
+        
         private CardSelector m_nextSelector;
         private CardSelector m_thirdSelector;
         private CardSelector m_sorting;
         private CardSelector m_nextSorting;
         private CardSelector m_thirdSorting;
         private CardSelector m_materialSelector;
-        private CardPosition m_position = CardPosition.FaceUpAttack;
-        private int m_place;
+       
+        private IList<CardSelector> m_selector = new List<CardSelector>();
+        private IList<CardPosition> m_position = new List<CardPosition>();
+        private IList<int> m_place = new List<int>();       
         private int m_option;
         private int m_number;
         private int m_announce;
         private int m_yesno;
         private IList<CardAttribute> m_attributes = new List<CardAttribute>();
         private IList<CardRace> m_races = new List<CardRace>();
-
+        public bool ManualPhaseChange=false;
         public void SelectCard(ClientCard card)
-        {
-            m_selector = new CardSelector(card);
+        {            
+            m_selector.Add(new CardSelector(card));        
         }
 
         public void SelectCard(IList<ClientCard> cards)
-        {
-            m_selector = new CardSelector(cards);
+        {            
+            m_selector.Add(new CardSelector(cards));           
         }
 
         public void SelectCard(int cardId)
-        {
-            m_selector = new CardSelector(cardId);
+        {           
+            m_selector.Add(new CardSelector(cardId));          
         }
 
         public void SelectCard(IList<int> ids)
-        {
-            m_selector = new CardSelector(ids);
+        {           
+            m_selector.Add(new CardSelector(ids));          
         }
 
         public void SelectCard(CardLocation loc)
-        {
-            m_selector = new CardSelector(loc);
+        {            
+            m_selector.Add(new CardSelector(loc));           
         }
 
         public void SelectNextCard(ClientCard card)
-        {
-            m_nextSelector = new CardSelector(card);
+        {          
+            m_selector.Add(new CardSelector(card));          
         }
 
         public void SelectNextCard(IList<ClientCard> cards)
         {
-            m_nextSelector = new CardSelector(cards);
+            m_selector.Add(new CardSelector(cards));          
         }
 
         public void SelectNextCard(int cardId)
         {
-            m_nextSelector = new CardSelector(cardId);
+            m_selector.Add(new CardSelector(cardId));            
         }
 
         public void SelectNextCard(IList<int> ids)
         {
-            m_nextSelector = new CardSelector(ids);
+            m_selector.Add(new CardSelector(ids));
+           /* Logger.DebugWriteLine("m_selector.Count= " + m_selector.Count);
+            Logger.DebugWriteLine("m_selector[0].Name" + m_selector[0].Name);
+            Logger.DebugWriteLine("m_selector[1].Name" + m_selector[1].Name);*/
         }
 
         public void SelectNextCard(CardLocation loc)
-        {
+        {          
             m_nextSelector = new CardSelector(loc);
+            m_selector.Add(m_nextSelector);         
         }
 
         public void SelectThirdCard(ClientCard card)
-        {
-            m_thirdSelector = new CardSelector(card);
+        {           
+            m_selector.Add(new CardSelector(card));            
         }
 
         public void SelectThirdCard(IList<ClientCard> cards)
-        {
-            m_thirdSelector = new CardSelector(cards);
+        {           
+            m_selector.Add(new CardSelector(cards));         
         }
 
         public void SelectThirdCard(int cardId)
-        {
-            m_thirdSelector = new CardSelector(cardId);
+        {           
+            m_selector.Add(new CardSelector(cardId));           
         }
 
         public void SelectThirdCard(IList<int> ids)
-        {
-            m_thirdSelector = new CardSelector(ids);
+        {           
+            m_selector.Add(new CardSelector(ids));         
         }
 
         public void SelectThirdCard(CardLocation loc)
-        {
-            m_thirdSelector = new CardSelector(loc);
+        {           
+            m_selector.Add(new CardSelector(loc));          
         }
 
         public void SortCard(ClientCard card)
@@ -843,101 +894,48 @@ namespace WindBot.Game
         {
             m_sorting = new CardSelector(loc);
         }
-
-        public void SortNextCard(ClientCard card)
-        {
-            m_nextSorting = new CardSelector(card);
-        }
-
-        public void SortNextCard(IList<ClientCard> cards)
-        {
-            m_nextSorting = new CardSelector(cards);
-        }
-
-        public void SortNextCard(int cardId)
-        {
-            m_nextSorting = new CardSelector(cardId);
-        }
-
-        public void SortNextCard(IList<int> ids)
-        {
-            m_nextSorting = new CardSelector(ids);
-        }
-
-        public void SortNextCard(CardLocation loc)
-        {
-            m_nextSorting = new CardSelector(loc);
-        }
-
-        public void SortThirdCard(ClientCard card)
-        {
-            m_thirdSorting = new CardSelector(card);
-        }
-
-        public void SortThirdCard(IList<ClientCard> cards)
-        {
-            m_thirdSorting = new CardSelector(cards);
-        }
-
-        public void SortThirdCard(int cardId)
-        {
-            m_thirdSorting = new CardSelector(cardId);
-        }
-
-        public void SortThirdCard(IList<int> ids)
-        {
-            m_thirdSorting = new CardSelector(ids);
-        }
-
-        public void SortThirdCard(CardLocation loc)
-        {
-            m_thirdSorting = new CardSelector(loc);
-        }
-
+        
         public void SelectMaterials(ClientCard card)
         {
-            m_materialSelector = new CardSelector(card);
+            m_materialSelector = new CardSelector(card);          
         }
 
         public void SelectMaterials(IList<ClientCard> cards)
         {
-            m_materialSelector = new CardSelector(cards);
+            m_materialSelector = new CardSelector(cards);         
         }
 
         public void SelectMaterials(int cardId)
         {
-            m_materialSelector = new CardSelector(cardId);
+            m_materialSelector = new CardSelector(cardId);           
         }
 
         public void SelectMaterials(IList<int> ids)
         {
-            m_materialSelector = new CardSelector(ids);
+            m_materialSelector = new CardSelector(ids);          
         }
 
         public void SelectMaterials(CardLocation loc)
         {
-            m_materialSelector = new CardSelector(loc);
+            m_materialSelector = new CardSelector(loc);         
         }
 
         public void CleanSelectMaterials()
         {
-            m_materialSelector = null;
+            m_materialSelector = null;  
         }
 
         public CardSelector GetSelectedCards()
         {
-            CardSelector selected = m_selector;
-            m_selector = null;
-            if (m_nextSelector != null)
+            //Logger.DebugWriteLine("***********GetSelectedCards");
+           // Logger.DebugWriteLine("m_selector.Count" + m_selector.Count);
+            CardSelector selected = null;
+            if(m_selector.Count>0)
             {
-                m_selector = m_nextSelector;
-                m_nextSelector = null;
-                if (m_thirdSelector != null)
-                {
-                    m_nextSelector = m_thirdSelector;
-                    m_thirdSelector = null;
-                }
-            }
+               // Logger.DebugWriteLine("m_selector[0]" + m_selector[0].Name);
+                selected = m_selector[0];                
+                m_selector.RemoveAt(0);
+            }           
             return selected;
         }
 
@@ -958,21 +956,43 @@ namespace WindBot.Game
             return sorting;
         }
 
-        public void SelectPosition(CardPosition pos)
+        public int GetSelectedPlace()
         {
-            m_position = pos;
+            int selected = 0;
+            if (m_place.Count > 0)
+            {
+                selected = m_place[0];
+                m_place.RemoveAt(0);
+            }
+            return selected;
         }
+
+        public CardPosition GetSelectedPosition()
+        {            
+            CardPosition selected = CardPosition.FaceUpAttack;            
+            if (m_position.Count > 0)
+            {
+                selected = m_position[0];               
+                m_position.RemoveAt(0);
+            }                
+            return selected;
+        }
+
+        public void SelectPosition(CardPosition pos)
+        {         
+            m_position.Add(pos);          
+        }
+        
         /// <summary>
         /// parameter type:avoid choosing the place with column negate
         /// </summary>
         /// <param name="type">Use CardType or  Zones(single way:1 for MainMonsterZone;2 for spell;4 for trap;3 for ExtraMonsterZone)</param>        
         public void SelectPlace(int zones, int type = 0)
-        {            
-            m_place = zones;
+        {
+            m_place.Add(zones);           
             Duel.Global.m_type = type;
             Duel.Global.intial_zone = Zones.z2;
-            Duel.Global.intial_zone = zones;
-         
+            Duel.Global.intial_zone = zones;         
         }
 
         public void SelectOption(int opt)
@@ -1076,7 +1096,7 @@ namespace WindBot.Game
 
         public BattlePhaseAction Attack(ClientCard attacker, ClientCard defender)
         {
-            Logger.DebugWriteLine("attack action");
+            //Logger.DebugWriteLine("attack action");
             Executor.SetCard(0, attacker, -1);
             if (defender != null)
             {
@@ -1112,6 +1132,6 @@ namespace WindBot.Game
                 (exec.Func == null || exec.Func()))
                 return true;
             return false;
-        }
+        }        
     }
 }

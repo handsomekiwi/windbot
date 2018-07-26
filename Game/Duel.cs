@@ -21,8 +21,8 @@ namespace WindBot.Game
         public IList<ClientCard> ChainTargets { get; set; }
         public int LastSummonPlayer { get; set; }
         public ClientCard LastSummonMonster { get; set; }
-       
-
+        public bool refresh { get; set; }
+        public bool Onattack { get; set; }
         public Duel()
         {
             Fields = new ClientField[2];
@@ -33,7 +33,8 @@ namespace WindBot.Game
             ChainTargets = new List<ClientCard>();
             LastSummonPlayer = -1;
             LastSummonMonster = null;
-           
+            refresh = false;
+            Onattack = false;
         }
 
         public ClientCard GetCard(int player, CardLocation loc, int index)
@@ -189,8 +190,6 @@ namespace WindBot.Game
             public static int m_zone;
             public static int intial_zone = 2;
             public static int InfiniteTransience_zone;
-           
-            public static bool ToBattlePhase = false;
             public static int Bot_Remain_Attacker_Count = 0;
             public static ClientCard BotLastattacker = null;
         }

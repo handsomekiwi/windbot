@@ -36,15 +36,18 @@ namespace WindBot.Game.AI
             public const int ChickenGame = 67616300;
 
             public const int InfiniteTransience = 10045474;
+            public const int MacroCosmos = 30241314;
+            public const int UpstartGoblin = 70368879;
 
             public const int CastelTheSkyblasterMusketeer = 82633039;
             public const int CrystalWingSynchroDragon = 50954680;
             public const int NumberS39UtopiaTheLightning = 56832966;
             public const int Number39Utopia = 84013237;
             public const int UltimayaTzolkin = 1686814;
-
+            public const int RaidraptorUltimateFalcon = 86221741;
             public const int VampireFräulein = 6039967;
             public const int InjectionFairyLily = 79575620;
+            public const int DestingKingZeroLaplace = 21686473;
 
             public const int JackKnightOfTheLavenderDust = 28692962;
             public const int JackKnightOfTheCobaltDepths = 92204263;
@@ -62,8 +65,21 @@ namespace WindBot.Game.AI
             public const int BlueEyesChaosMAXDragon = 55410871;
 
             public const int EaterOfMillions = 63845230;
+            public const int GoldenCastleOfStromberg = 72283691;
+            public const int KnightmareGryphon = 65330383;
+            public const int AshBlossom = 14558127;
+            public const int MaxxC = 23434538;
+            public const int LockBird = 94145021;
+            public const int Ghost = 59438930;
+            public const int EffectVeiler = 63845230;
+            public const int GalaxySoldier = 46659709;
+            public const int FlowerCardianLightflare = 87460579;
+            public const int AmanoIwato = 32181268;
+            public const int ApprenticeLllusionMagician = 30603688;
+            public const int EternalSoul = 48680970;
+            public const int MoonMirrorShield = 19508728;
         }
-
+        IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
         {
@@ -251,7 +267,32 @@ namespace WindBot.Game.AI
         /// <param name="defenders">Cards that defend.</param>
         /// <returns>BattlePhaseAction including the target, or null (in this situation, GameAI will check the next attacker)</returns>
         public override BattlePhaseAction OnSelectAttackTarget(ClientCard attacker, IList<ClientCard> defenders)
-        {        
+        {
+            //Logger.DebugWriteLine("OnSelectAttackTarget");
+            if (AI.Utils.GetWorstEnemyMonster(true) != null)
+            {
+                for (int i = 0; i < defenders.Count; ++i)
+                {
+                    ClientCard defender = defenders[i];
+
+                    attacker.RealPower = attacker.Attack;
+                    defender.RealPower = defender.GetDefensePower();
+                    if (!OnPreBattleBetween(attacker, defender))
+                        continue;
+
+                    ClientCard FirstDefender = AI.Utils.GetWorstEnemyMonster(true);
+                    if ((attacker.RealPower - FirstDefender.RealPower) >= Enemy.LifePoints && FirstDefender.IsAttack())
+                    {
+                        if ((FirstDefender == Enemy.MonsterZone.GetDangerousMonster() && FirstDefender.IsDisabled()) ||
+                            FirstDefender != Enemy.MonsterZone.GetDangerousMonster())
+                        {
+                            if (defender == FirstDefender)
+                                return AI.Attack(attacker, defender);
+                        }
+                    }
+                }
+            }
+            
             for (int i = 0; i < defenders.Count; ++i)
             {
                 ClientCard defender = defenders[i];
@@ -260,23 +301,7 @@ namespace WindBot.Game.AI
                 defender.RealPower = defender.GetDefensePower();
                 if (!OnPreBattleBetween(attacker, defender))
                     continue;
-                if (AI.Utils.GetWorstEnemyMonster(true) != null)
-                {
-                    ClientCard FirstDefender = AI.Utils.GetWorstEnemyMonster(true);
-                    if ((attacker.RealPower - FirstDefender.RealPower) >= Enemy.LifePoints && FirstDefender.IsAttack())
-                    {
-                        if (FirstDefender == Enemy.MonsterZone.GetDangerousMonster() && FirstDefender.IsDisabled())
-                        {
-                            if (defender != FirstDefender)
-                                return null;
-                        }
-                        if (FirstDefender != Enemy.MonsterZone.GetDangerousMonster())
-                        {
-                            if (defender != FirstDefender)
-                                return null;
-                        }
-                    }
-                }
+                
                 if (attacker.RealPower > defender.RealPower || (attacker.RealPower >= defender.RealPower && attacker.IsLastAttacker && defender.IsAttack()))
                     return AI.Attack(attacker, defender);
             }
@@ -296,27 +321,26 @@ namespace WindBot.Game.AI
         /// <returns>false if the attack shouldn't be done.</returns>
         public override bool OnPreBattleBetween(ClientCard attacker, ClientCard defender)
         {
-            if (attacker.RealPower <= 0)
+            if (Enemy.HasInSpellZone(_CardId.GoldenCastleOfStromberg, true))
                 return false;
-            if (defender.Id == _CardId.JackKnightOfTheCobaltDepths &&
-                (defender.Attack == 0 || defender.Attack == 1200))
-                defender.RealPower += 2400;
+            if (Enemy.HasInSpellZone(_CardId.MoonMirrorShield, true) && defender.IsEquiped(_CardId.MoonMirrorShield))
+                defender.RealPower = (attacker.Attack > attacker.Defense ? attacker.Attack:attacker.Defense) + 100;
+            if (Bot.HasInSpellZone(_CardId.MoonMirrorShield, true) && attacker.IsEquiped(_CardId.MoonMirrorShield))
+                attacker.RealPower = (defender.Attack > defender.Defense ? defender.Attack : defender.Defense) + 100;
             if (!attacker.IsMonsterHasPreventActivationEffectInBattle())
-            {
-                if (defender.IsMonsterInvincible() && defender.IsDefense())
-                    return false;
-
-                if (defender.IsMonsterDangerous())
-                {
-                    bool canignoreit = false;
-                    if (attacker.Id == _CardId.UltimateConductorTytanno && !attacker.IsDisabled() && defender.IsDefense())
-                        canignoreit = true;
-                    if (attacker.Id == _CardId.UltimateConductorTytanno && defender.IsFacedown())
-                        canignoreit = true;
-                    if (!canignoreit)
-                        return false;
+            {                 
+                if(defender.Race==(int)CardRace.SpellCaster && defender.Attribute== (int)CardAttribute.Dark &&
+                    Enemy.HasInMonstersZone(_CardId.ApprenticeLllusionMagician,true) && defender.IsAttack() &&
+                    defender.Id!=_CardId.ApprenticeLllusionMagician)
+                {                    
+                    defender.RealPower = defender.Attack + 2000;                   
                 }
 
+                if(defender.Id==_CardId.DestingKingZeroLaplace && defender.IsAttack() && !defender.IsDisabled())
+                {
+                    defender.RealPower = attacker.Attack * 2;
+                }
+                
                 if (defender.Id == _CardId.CrystalWingSynchroDragon && defender.IsAttack() && !defender.IsDisabled() && attacker.Level >= 5)
                     return false;
 
@@ -332,16 +356,43 @@ namespace WindBot.Game.AI
 
             if (!defender.IsMonsterHasPreventActivationEffectInBattle())
             {
+                if (attacker.Id == _CardId.EaterOfMillions && !attacker.IsDisabled())
+                {
+                    if (defender.HasType(CardType.Token)) return false;
+                    if (Enemy.MonsterZone[ReverseBotEnemyZone(attacker.Zone)] != null &&
+                    IsJackKnightMonster(ReverseBotEnemyZone(attacker.Zone)) &&
+                    Enemy.HasInSpellZone(_CardId.JackKnightOfTheCobaltDepths, true))
+                        return false;
+                    if (defender.Id == _CardId.RaidraptorUltimateFalcon ||
+                        defender.Id == _CardId.NumberS39UtopiaTheLightning ||
+                        defender.Id == _CardId.FlowerCardianLightflare)
+                        return false;
+                    if (Enemy.HasInMonstersZone(_CardId.KnightmareGryphon, true) ||
+                    Enemy.HasInMonstersZone(_CardId.AmanoIwato, true))
+                    {
+                        if (attacker.RealPower <= defender.RealPower)
+                            return false;
+                    }
+                    attacker.RealPower = 9999;
+                    return true;
+                }
+                if (attacker.Id == _CardId.UltimateConductorTytanno && !attacker.IsDisabled() && defender.IsDefense())
+                {
+                    attacker.RealPower = 9999;
+                    return true;
+                }
                 if (attacker.Id == _CardId.NumberS39UtopiaTheLightning && !attacker.IsDisabled() && attacker.HasXyzMaterial(2, _CardId.Number39Utopia))
                     attacker.RealPower = 5000;
             }
 
+            if (defender.IsMonsterInvincible() && defender.IsDefense())
+                return false;
             if (Enemy.HasInMonstersZone(_CardId.DupeFrog, true) && defender.Id != _CardId.DupeFrog)
                 return false;
 
             if (Enemy.HasInMonstersZone(_CardId.MaraudingCaptain, true) && defender.Id != _CardId.MaraudingCaptain && defender.Race == (int)CardRace.Warrior)
                 return false;
-
+            
             if (defender.Id == _CardId.UltimayaTzolkin && !defender.IsDisabled())
             {
                 List<ClientCard> monsters = Enemy.GetMonsters();
@@ -408,10 +459,10 @@ namespace WindBot.Game.AI
                     if (NoJackKnightColumn(i) && Bot.MonsterZone[ReverseBotEnemyZone(i)] == null)
                     {
                         Duel.Global.m_zone = ReverseZoneTo16bit(ReverseBotEnemyZone(i));
-                        Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                       // Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                         break;
                     }
-                    Logger.DebugWriteLine("%%%%%%selsectplacecheck"+ i+ " = " + Duel.Global.m_zone);
+                   // Logger.DebugWriteLine("%%%%%%selsectplacecheck"+ i+ " = " + Duel.Global.m_zone);
                 }                
             }
             if ((Duel.Global.m_type == 1 || Duel.Global.m_type == Zones.MainMonsterZones) && 
@@ -427,10 +478,10 @@ namespace WindBot.Game.AI
                     if (Bot.MonsterZone[i] == null)
                     {
                         Duel.Global.m_zone = ReverseZoneTo16bit(i);
-                        Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                       // Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                         break;
                     }
-                    Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                   // Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                 }      
             }
             if ((Duel.Global.m_type == 1 || Duel.Global.m_type == Zones.MainMonsterZones) && 
@@ -448,7 +499,7 @@ namespace WindBot.Game.AI
                         Duel.Global.m_zone = ReverseZoneTo16bit(i);
                         break;
                     }
-                    Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                    //Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                 }
             }
             if ((Duel.Global.m_type == 2 || Duel.Global.m_type==(int)CardType.Spell) && 
@@ -463,10 +514,10 @@ namespace WindBot.Game.AI
                     if (NoJackKnightColumn(i) && Bot.SpellZone[ReverseBotEnemyZone(i)] == null)
                     {                        
                         Duel.Global.m_zone = ReverseZoneTo16bit(ReverseBotEnemyZone(i));
-                        Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                        //Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                         break;
                     }
-                    Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
+                   // Logger.DebugWriteLine("%%%%%%selsectplacecheck" + i + " = " + Duel.Global.m_zone);
                 }
             }
             if(((Duel.Global.m_type == 2 || Duel.Global.m_type == (int)CardType.Spell) ||
@@ -518,22 +569,67 @@ namespace WindBot.Game.AI
         }
         public override bool OnSelectBattleReplay()
         {
-            if (Bot.BattlingMonster == null)
-                return false;
+            //Logger.DebugWriteLine("OnSelectBattleReplay");
+            /*if (Bot.BattlingMonster == null)
+                return false;*/
             List<ClientCard> defenders = new List<ClientCard>(Duel.Fields[1].GetMonsters());
-            defenders.Sort(AIFunctions.CompareDefensePower);
+            foreach(ClientCard check in defenders)
+            {
+                Bot.BattlingMonster.RealPower = Bot.BattlingMonster.Attack;
+                check.RealPower = check.GetDefensePower();
+                Logger.DebugWriteLine("defender= " + check.Name+OnPreBattleBetween(Bot.BattlingMonster, check).ToString());
+                Logger.DebugWriteLine("attacker.realpower= " + Bot.BattlingMonster.RealPower);
+                if (OnPreBattleBetween(Bot.BattlingMonster, check))
+                {
+                    if(Bot.BattlingMonster.RealPower >= check.RealPower)
+                    {
+                        AI.Attack(Bot.BattlingMonster, check);
+                        return true;
+                    }                    
+                }                    
+            }
+            /*defenders.Sort(AIFunctions.CompareDefensePower);
             defenders.Reverse();
             BattlePhaseAction result = OnSelectAttackTarget(Bot.BattlingMonster, defenders);
             if (result != null && result.Action == BattlePhaseAction.BattleAction.Attack)
             {
                 return true;
-            }
+            }*/
             return false;
         }
-
+        
+        public override int OnSelectChain(IList<ClientCard> cards, IList<int> descs, bool forced)
+        { 
+            //NEED TO DO :遗言怪,不被战破怪
+            if (Duel.Phase == DuelPhase.BattleStart && Duel.Player == 1)
+            {                
+                IList<ClientCard> refreshattackers = new List<ClientCard>();
+                
+                if (EnemyAttackers.Contains(Enemy.BattlingMonster) && Duel.Onattack)
+                {
+                    EnemyAttackers.Remove(Enemy.BattlingMonster);
+                    Duel.Onattack = false;
+                }                
+                if (Duel.refresh)
+                {
+                    Enemy.RemainAttackerCount = EnemyAttackers.Count;
+                    Duel.refresh = false;
+                }       
+            }
+            return base.OnSelectChain(cards, descs, forced);
+        }
         public override void OnNewPhase()
         {
-            
+            EnemyAttackers.Clear();
+            if(Duel.Phase==DuelPhase.BattleStart && Duel.Player==1)
+            {
+                foreach (ClientCard m in Enemy.GetMonsters())
+                {
+                    if (m.IsAttack() && m.Attack > 0)
+                        EnemyAttackers.Add(m);
+                }
+                Enemy.RemainAttackerCount = EnemyAttackers.Count;
+            }
         }
 
         public override void OnChaining(int player, ClientCard card)
@@ -546,7 +642,7 @@ namespace WindBot.Game.AI
                     if (Enemy.SpellZone[i] != null && Enemy.SpellZone[i].Id == _CardId.InfiniteTransience)
                         Duel.Global.InfiniteTransience_zone = i;
                 }
-                Logger.DebugWriteLine("*******HasInfiniteTransience*************");
+                //Logger.DebugWriteLine("*******HasInfiniteTransience*************");
             }
         }
 
@@ -694,6 +790,68 @@ namespace WindBot.Game.AI
             return true;
         }
         /// <summary>
+        /// Default AshBlossomAndJoyousSpring effect
+        /// </summary>
+        protected bool DefaultAshBlossomAndJoyousSpring()
+        {
+            if (AI.Utils.GetLastChainCard().Id == _CardId.MacroCosmos)
+                return false;
+            if (AI.Utils.GetLastChainCard().Id == _CardId.UpstartGoblin)
+                return false;
+            return Duel.LastChainPlayer == 1;
+        }
+        /// <summary>
+        /// Default GhostOgreAndSnowRabbit effect
+        /// </summary>
+        protected bool DefaultGhostOgreAndSnowRabbit()
+        {
+            if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
+                return false;
+            return DefaultTrap();
+        }
+        /// <summary>
+        /// Default EffectVeiler effect
+        /// </summary>
+        protected bool DefaultEffectVeiler()
+        {
+            if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().Id == _CardId.GalaxySoldier && Enemy.Hand.Count >= 3) return false;
+            if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
+                return false;
+            if (AI.Utils.ChainContainsCard(_CardId.EffectVeiler))
+                return false;
+            return DefaultBreakthroughSkill();
+        }
+        /// <summary>
+        /// Default CalledByTheGrave effect
+        /// </summary>
+        protected bool DefaultCalledByTheGrave()
+        {
+            if (Duel.LastChainPlayer == 1)
+            {
+                if (AI.Utils.GetLastChainCard().Id == _CardId.MaxxC)
+                {
+                    AI.SelectCard(_CardId.MaxxC);
+                    return UniqueFaceupSpell();
+                }
+                if (AI.Utils.GetLastChainCard().Id == _CardId.LockBird)
+                {
+                    AI.SelectCard(_CardId.LockBird);
+                    return UniqueFaceupSpell();
+                }
+                if (AI.Utils.GetLastChainCard().Id == _CardId.Ghost)
+                {
+                    AI.SelectCard(_CardId.Ghost);
+                    return UniqueFaceupSpell();
+                }
+                if (AI.Utils.GetLastChainCard().Id == _CardId.AshBlossom)
+                {
+                    AI.SelectCard(_CardId.AshBlossom);
+                    return UniqueFaceupSpell();
+                }
+            }
+            return false;
+        }
+        /// <summary>
         /// Default InfiniteImpermanence effect
         /// </summary>
         protected bool DefaultInfiniteImpermanence()
@@ -723,11 +881,19 @@ namespace WindBot.Game.AI
             }
             if (Bot.BattlingMonster != null && Enemy.BattlingMonster != null)
             {
+                if (Enemy.BattlingMonster.IsDisabled()) return false;
                 if (Enemy.BattlingMonster.Id == _CardId.EaterOfMillions)
                 {
                     AI.SelectCard(Enemy.BattlingMonster);
                     return true;
                 }
+            }
+            if (Duel.Phase == DuelPhase.BattleStart && Duel.Player == 1 &&
+                Enemy.HasInMonstersZone(_CardId.NumberS39UtopiaTheLightning, true))
+            {
+
+                AI.SelectCard(_CardId.NumberS39UtopiaTheLightning);
+                return UniqueFaceupSpell();
             }
             return false;
         }
@@ -912,6 +1078,7 @@ namespace WindBot.Game.AI
         /// </summary>
         protected bool DefaultOnBecomeTarget()
         {
+            if (Duel.LastChainPlayer != 1) return false;
             if (AI.Utils.IsChainTarget(Card)) return true;
             if (AI.Utils.ChainContainsCard(_CardId.TopologicTrisbaena)) return true;
             if (AI.Utils.ChainContainsCard(_CardId.BlackRoseDragon)) return true;
@@ -985,7 +1152,7 @@ namespace WindBot.Game.AI
             {
                 if (exec.Type == Type && exec.CardId == Card.Id)
                     return false;
-            }
+            }            
             return Duel.LastChainPlayer != 0;
         }
 

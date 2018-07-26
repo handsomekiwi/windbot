@@ -228,28 +228,7 @@ namespace WindBot.Game.AI.Decks
                     if (getLinkMarker(card.Id) == 5) judge = false;
                 }
             }
-            // can ss from exdeck
-            if (judge)
-            {
-                bool fornextss = AI.Utils.ChainContainsCard(CardId.Grass);
-                IList<ClientCard> ex = Bot.ExtraDeck;
-                ClientCard ex_best = null;
-                foreach (ClientCard ex_card in ex)
-                {
-                    if (!fornextss)
-                    {
-                        if (ex_best == null || ex_card.Attack > ex_best.Attack) ex_best = ex_card;
-                    }
-                    else
-                    {
-                        if (getLinkMarker(ex_card.Id) != 5 && (ex_best == null || ex_card.Attack > ex_best.Attack)) ex_best = ex_card;
-                    }
-                }
-                if (ex_best != null)
-                {
-                    AI.SelectCard(ex_best);
-                }
-            }
+
             if (!judge || AI.Utils.ChainContainsCard(CardId.Grass))
             {
                 // cannot ss from exdeck or have more than 1 grass in chain
@@ -278,12 +257,34 @@ namespace WindBot.Game.AI.Decks
                 }
                 else
                 {
-                    if (!judge)
-                        AI.SelectCard(secondselect);
+                    /*if (!judge)
+                        AI.SelectCard(secondselect);*/                   
                     AI.SelectNextCard(secondselect);
-                    AI.SelectThirdCard(secondselect);
+                    // AI.SelectThirdCard(secondselect);
                 }
             }
+            // can ss from exdeck
+            else if (judge)
+            {
+                bool fornextss = AI.Utils.ChainContainsCard(CardId.Grass);
+                IList<ClientCard> ex = Bot.ExtraDeck;
+                ClientCard ex_best = null;
+                foreach (ClientCard ex_card in ex)
+                {
+                    if (!fornextss)
+                    {
+                        if (ex_best == null || ex_card.Attack > ex_best.Attack) ex_best = ex_card;
+                    }
+                    else
+                    {
+                        if (getLinkMarker(ex_card.Id) != 5 && (ex_best == null || ex_card.Attack > ex_best.Attack)) ex_best = ex_card;
+                    }
+                }
+                if (ex_best != null)
+                {
+                    AI.SelectCard(ex_best);
+                }
+            }            
             return true;
         }
 
@@ -1757,7 +1758,7 @@ namespace WindBot.Game.AI.Decks
 
                 if (!defender.IsMonsterHasPreventActivationEffectInBattle() && !attacker.IsDisabled())
                 {
-                    if ((attacker.Id == CardId.Eater && !defender.HasType(CardType.Token)) || attacker.Id == CardId.Borrel) return AI.Attack(attacker, defender);
+                    if (attacker.Id == CardId.Borrel) return AI.Attack(attacker, defender);
                     if ((attacker.Id == CardId.Ultimate || attacker.Id == CardId.Cardian) && attacker.RealPower > defender.RealPower) return AI.Attack(attacker, defender);
                 }
 

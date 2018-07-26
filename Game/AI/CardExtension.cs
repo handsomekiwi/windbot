@@ -61,6 +61,14 @@ namespace WindBot.Game.AI
             return !card.IsDisabled() && Enum.IsDefined(typeof(ShouldBeDisabledBeforeItUseEffectMonster), card.Id);
         }
 
+        /// <summary>
+        /// Is this card should not be destroyed by card effect?
+        /// </summary>
+        public static bool IShouldNotBeDestroyedByCardEffect(this ClientCard card)
+        {
+            return !card.IsDisabled() && Enum.IsDefined(typeof(ShouldNotBeDestroyedByCardEffect), card.Id);
+        }
+
         public static bool IsFloodgate(this ClientCard card)
         {
             return Enum.IsDefined(typeof(Floodgate), card.Id);

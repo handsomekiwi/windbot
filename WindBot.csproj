@@ -15,12 +15,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\Desktop\YGOPro\WindBot\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\Release\</OutputPath>
@@ -68,8 +69,12 @@
     <Compile Include="Game\AI\DecksManager.cs" />
     <Compile Include="Game\AI\Decks\BrandishLordExecutor.cs" />
     <Compile Include="Game\AI\Decks\BlackwingExecutor.cs" />
+    <Compile Include="Game\AI\Decks\BlueEyesMaxDragonExecutor.cs" />
+    <Compile Include="Game\AI\Decks\BujinExecutor.cs" />
     <Compile Include="Game\AI\Decks\CyberDragonExecutor.cs" />
+    <Compile Include="Game\AI\Decks\InfernoidExecutor.cs" />
     <Compile Include="Game\AI\Decks\SkyStrikerExecutor.cs" />
+    <Compile Include="Game\AI\Decks\KozmoExecutor.cs" />
     <Compile Include="Game\AI\Decks\MokeyMokeyKingExecutor.cs" />
     <Compile Include="Game\AI\Decks\MokeyMokeyExecutor.cs" />
     <Compile Include="Game\AI\Decks\ToadallyAwesomeExecutor.cs" />
@@ -87,6 +92,7 @@
     <Compile Include="Game\AI\Decks\LightswornShaddoldinosourExecutor.cs" />
     <Compile Include="Game\AI\Decks\QliphortExecutor.cs" />
     <Compile Include="Game\AI\Decks\ST1732Executor.cs" />
+    <Compile Include="Game\AI\Decks\ThunderDragonExecutor.cs" />
     <Compile Include="Game\AI\Decks\TrickstarExecutor.cs" />
     <Compile Include="Game\AI\Decks\YosenjuExecutor.cs" />
     <Compile Include="Game\AI\Decks\DragunityExecutor.cs" />
@@ -101,6 +107,7 @@
     <Compile Include="Game\AI\Dialogs.cs" />
     <Compile Include="Game\AI\Enums\DangerousMonster.cs" />
     <Compile Include="Game\AI\Enums\FusionSpell.cs" />
+    <Compile Include="Game\AI\Enums\ShouldNotBeDestroyedByCardEffect.cs" />
     <Compile Include="Game\AI\Enums\ShouldBeDisabledBeforeItUseEffectMonster.cs" />
     <Compile Include="Game\AI\Enums\ShouldNotBeSpellTarget.cs" />
     <Compile Include="Game\AI\Enums\ShouldNotBeMonsterTarget.cs" />

@@ -458,7 +458,7 @@ namespace WindBot.Game.AI.Decks
             if (ActivateDescription == -1)
             {
                AI.SortCard(AbouluteKingBackJack_List_1());
-               AI.SortNextCard(AbouluteKingBackJack_List_2());                
+               AI.SortCard(AbouluteKingBackJack_List_2());                
             }
 
             return true;

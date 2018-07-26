@@ -708,7 +708,7 @@ namespace WindBot.Game.AI.Decks
             {
                 return true;
             }
-            ClientCard target = AI.Utils.GetProblematicEnemyCard();
+            ClientCard target = AI.Utils.GetProblematicEnemyCard(0,true);
             if (target != null)
             {
                 AI.SelectCard(target);

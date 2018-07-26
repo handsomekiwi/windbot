@@ -12,8 +12,7 @@ namespace WindBot.Game.AI
             Id,
             Ids,
             Location
-        }
-
+        }       
         private SelectType _type;
         private ClientCard _card;
         private IList<ClientCard> _cards;
