@@ -59,7 +59,19 @@ namespace WindBot.Game.AI
                 return 0;
             return 1;
         }
-
+        /// <summary>
+        /// Get the total ATK of the player.
+        /// </summary>
+        public int GetTotalAttackingMonsterAttack(int player)
+        {
+            int atk = 0;
+            foreach(ClientCard m in Duel.Fields[player].GetMonsters())
+            {
+                if (m.IsAttack())
+                    atk += m.Attack;                
+            }
+            return atk;
+        }
         /// <summary>
         /// Get the best ATK or DEF power of the field.
         /// </summary>
@@ -251,7 +263,7 @@ namespace WindBot.Game.AI
             return GetOneEnemyBetterThanValue(bestBotPower, onlyATK, canBeTarget);
         }
 
-        public ClientCard GetProblematicEnemyCard(int attack = 0, bool canBeTarget = false)
+        public ClientCard GetProblematicEnemyCard(int defensepower = 0, bool canBeTarget = false)
         {
             ClientCard card = Enemy.MonsterZone.GetFloodgate(canBeTarget);
             if (card != null && card!=IsUnffectCardWithCondition(canBeTarget))
@@ -269,9 +281,12 @@ namespace WindBot.Game.AI
             if (card != null && card != IsUnffectCardWithCondition(canBeTarget))
                 return card;
 
-            if (attack == 0)
-                attack = GetBestAttack(Bot);
-            return GetOneEnemyBetterThanValue(attack, true, canBeTarget);
+            if (defensepower == 0)
+            {
+                defensepower = GetBestAttack(Bot);
+                return GetOneEnemyBetterThanValue(defensepower, true, canBeTarget);
+            }
+            return GetOneEnemyBetterThanValue(defensepower, false, canBeTarget);
         }
 
         public ClientCard GetProblematicEnemyMonster(int attack = 0, bool canBeTarget = false)

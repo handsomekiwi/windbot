@@ -811,7 +811,10 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
-                AI.SelectCard(CardId.DarkMagician);
+                AI.SelectCard(new[] {
+                        CardId.ApprenticeLllusionMagician,
+                        CardId.DarkMagician,
+                        CardId.MagicianOfLllusion});
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
                     AI.SelectNextCard(new[] {
@@ -830,7 +833,10 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
-                AI.SelectCard(CardId.DarkMagician);
+                AI.SelectCard(new[] {
+                        CardId.ApprenticeLllusionMagician,
+                        CardId.DarkMagician,
+                        CardId.MagicianOfLllusion});
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
                     AI.SelectNextCard(new[] {
@@ -849,7 +855,10 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
-                AI.SelectCard(CardId.DarkMagician);
+                AI.SelectCard(new[] {
+                        CardId.ApprenticeLllusionMagician,
+                        CardId.DarkMagician,
+                        CardId.MagicianOfLllusion});
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
                     AI.SelectNextCard(new[] {
@@ -870,7 +879,10 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
-                AI.SelectCard(CardId.DarkMagician);
+                AI.SelectCard(new[] {
+                        CardId.ApprenticeLllusionMagician,
+                        CardId.DarkMagician,
+                        CardId.MagicianOfLllusion});
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
                     AI.SelectNextCard(new[] {
@@ -891,7 +903,10 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectPlace(Zones.z0 | Zones.z4);
                 AI.SelectPlace(Zones.z0 | Zones.z4);
-                AI.SelectCard(CardId.DarkMagician);
+                AI.SelectCard(new[] {
+                        CardId.ApprenticeLllusionMagician,
+                        CardId.DarkMagician,
+                        CardId.MagicianOfLllusion});
                 ClientCard check = AI.Utils.GetOneEnemyBetterThanValue(2500, true);
                 if (check != null)
                     AI.SelectNextCard(new[] {

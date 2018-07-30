@@ -141,7 +141,7 @@ namespace WindBot.Game
                 if (card.Controller == 0)
                     count++;
             }
-            if (Duel.CurrentChain.Count == 1 && count > 1)
+            if (Duel.CurrentChain.Count == 1 )
             {                
                 CardSelector temp;
                 for (int i = 0; i < m_selector.Count / 2; i++)
@@ -158,7 +158,7 @@ namespace WindBot.Game
         /// Called when a chain has been solved.
         /// </summary>
         public void OnChainEnd()
-        {
+        {            
             m_place.Clear();
             m_position.Clear();
             m_selector.Clear();

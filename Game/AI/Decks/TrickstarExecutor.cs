@@ -410,7 +410,11 @@ namespace WindBot.Game.AI.Decks
         public bool Sheep_Act()
         {
             if (Duel.Player == 0) return false;
-            if (Duel.Phase == DuelPhase.End) return true;
+            if (Duel.Phase == DuelPhase.End)
+            {
+                AI.SelectPlace(Zones.z2, 1);
+                return true;
+            }
             if (Duel.LastChainPlayer == 1 && (AI.Utils.IsChainTarget(Card) || (AI.Utils.GetLastChainCard().Id == CardId.Feather && !Bot.HasInSpellZone(CardId.Grass)))) return true;
             if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
             {
@@ -420,7 +424,11 @@ namespace WindBot.Game.AI.Decks
                 {
                     if (m.IsAttack() && !m.Attacked) total_atk += m.Attack;
                 }
-                if (total_atk >= Bot.LifePoints) return true;
+                if (total_atk >= Bot.LifePoints)
+                {
+                    AI.SelectPlace(Zones.z2, 1);
+                    return true;
+                }
             }
             return false;
         }

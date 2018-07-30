@@ -196,6 +196,17 @@ namespace WindBot.Game
             return HasInCards(ExtraDeck, cardId);
         }
 
+        public bool HasInExtra(int cardId,int count)
+        {
+            int c = 0;
+            foreach(ClientCard card in ExtraDeck)
+            {
+                if (card != null && card.Id == cardId)
+                    c++;
+            }
+            return c >= count;
+        }
+
         public bool HasInExtra(IList<int> cardId)
         {
             return HasInCards(ExtraDeck, cardId);

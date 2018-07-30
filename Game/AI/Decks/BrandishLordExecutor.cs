@@ -115,17 +115,18 @@ namespace WindBot.Game.AI.Decks
         public BrandishLordExecutor(GameAI ai, Duel duel)
             : base(ai, duel)            
         {
+            
             //counter 
             AddExecutor(ExecutorType.Activate, CardId.Typhoon, Typhooneffcounter);
             AddExecutor(ExecutorType.Activate, CardId.TorrentialTribute, TorrentialTributeeff);
             AddExecutor(ExecutorType.Activate, CardId.SolemnStrike, SolemnStrikeeff);
             AddExecutor(ExecutorType.Activate, CardId.SolemnWarning, DefaultSolemnWarning);
             AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);
-            AddExecutor(ExecutorType.Activate, CardId.EffectVeiler, EffectVeilereff);
+            AddExecutor(ExecutorType.Activate, CardId.EffectVeiler, DefaultEffectVeiler);
             AddExecutor(ExecutorType.Activate, CardId.WidowAnchor, WidowAnchorEffectFirst);
             AddExecutor(ExecutorType.Activate, CardId.AshBlossom, DefaultAshBlossomAndJoyousSpring);
-            AddExecutor(ExecutorType.Activate, CardId.GhostRabbit, GhostRabbiteff);
-            AddExecutor(ExecutorType.Activate, CardId.MaxxC, MaxxCEffect);
+            AddExecutor(ExecutorType.Activate, CardId.GhostRabbit, DefaultGhostOgreAndSnowRabbit);
+            AddExecutor(ExecutorType.Activate, CardId.MaxxC, DefaultMaxxC);
             AddExecutor(ExecutorType.Activate, CardId.Sharkcannon, Sharkcannoneff);
             AddExecutor(ExecutorType.Activate, CardId.WidowAnchor, WidowAnchorEffect);
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence,InfiniteImpermanenceeff);            
@@ -214,6 +215,8 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.SpSummon, CardId.BrandishMaidenHayate, HayateSp_B2);
             AddExecutor(ExecutorType.SpSummon, CardId.BrandishMaidenShizuku, ShizukuSp_B2);
 
+            //To battle phase
+            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);
             //card control           
             AddExecutor(ExecutorType.Activate, CardId.AreaZero, AreaZeroEffect);
             AddExecutor(ExecutorType.Activate, CardId.BrandishMaidenRei, BrandishMaidenReiEffect);
@@ -454,7 +457,19 @@ namespace WindBot.Game.AI.Decks
             }
         }
         
-        
+        private bool ToBattlePhaseeff()
+        {
+            if(Enemy.GetMonsterCount()==0)
+            {
+                if(AI.Utils.GetTotalAttackingMonsterAttack(0)>=Enemy.LifePoints)
+                {
+                    AI.ManualPhaseChange = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
         private bool DarkHoleeff()
         {
             if (Bot.GetMonsterCount() == 1 && Enemy.GetMonsterCount() >= 3 && 
@@ -1248,13 +1263,7 @@ namespace WindBot.Game.AI.Decks
         }
         
         //************************************************************************
-
-        private bool GhostRabbiteff()
-        {
-            if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
-                return false;
-            return DefaultTrap();
-        }
+                
         private bool GhostRabbitsummon()
         {
             if (AI.Utils.GetLastChainCard() != null &&
@@ -1262,21 +1271,8 @@ namespace WindBot.Game.AI.Decks
                 !BrandishMonsterExist() && !BrandishMonsterRestart() && Bot.GetMonsterCount() == 0)
                 return true;
             return false;
-        }
-        private bool MaxxCEffect()
-        {
-            return Duel.Player == 1;
-        }   
-        
-        private bool EffectVeilereff()
-        {
-            if (AI.Utils.GetLastChainCard()!=null && AI.Utils.GetLastChainCard().Id==CardId.GalaxySoldier && Enemy.Hand.Count >= 3) return false;
-            if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
-                return false;
-            if (AI.Utils.ChainContainsCard(CardId.EffectVeiler))
-                return false;
-            return DefaultBreakthroughSkill();
-        }
+        }        
+       
         private bool InfiniteImpermanenceeff()
         {
             if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
@@ -1332,6 +1328,7 @@ namespace WindBot.Game.AI.Decks
             Widow_control = true;
             if(DefaultOnBecomeTarget() && AI.Utils.GetBestEnemyMonster(true,true)!=null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(AI.Utils.GetBestEnemyMonster(true, true));
                 return true;
             }
@@ -1343,6 +1340,7 @@ namespace WindBot.Game.AI.Decks
             if (Duel.LastChainPlayer == 0) return false;
             if(Duel.Player==0 && Enemy.HasInMonstersZone(CardId.ElShaddollWinda,true))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.ElShaddollWinda);
                 return UniqueFaceupSpell();
             }
@@ -1356,23 +1354,27 @@ namespace WindBot.Game.AI.Decks
                 if (Enemy.BattlingMonster.Id == CardId.EaterOfMillions ||
                     Enemy.BattlingMonster.Id == CardId.GrenMajuDaEizo)
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     Widow_control = false;
                     AI.SelectCard(Enemy.BattlingMonster);
                     return UniqueFaceupSpell();
                 }
                 if(Duel.Player==1 && Enemy.BattlingMonster.Id== _CardId.NumberS39UtopiaTheLightning)
-                {                   
+                {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(Enemy.BattlingMonster);
                     return UniqueFaceupSpell();
                 }
                 if (Duel.Player == 1 && Enemy.BattlingMonster.Id == _CardId.UltimateConductorTytanno)
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(Enemy.BattlingMonster);
                     return UniqueFaceupSpell();
                 }
                 if (Enemy.BattlingMonster.IsMonsterDangerous() && SpellsCountInGrave() >= 3)
                 {
-                    {                       
+                    {
+                        AI.SelectPlace(Zones.z2, 2);
                         AI.SelectCard(Enemy.BattlingMonster);
                         return UniqueFaceupSpell();
                     }
@@ -1390,6 +1392,7 @@ namespace WindBot.Game.AI.Decks
                 SpellsCountInGrave()>=3 && 
                 (Enemy.BattlingMonster.Attack-Bot.BattlingMonster.Attack)>Bot.LifePoints)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(Enemy.BattlingMonster);
                 return UniqueFaceupSpell();
             }
@@ -1398,6 +1401,7 @@ namespace WindBot.Game.AI.Decks
                 SpellsCountInGrave() >= 3 &&
                Enemy.BattlingMonster.Attack > Bot.LifePoints)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(AI.Utils.GetBestEnemyMonster(true,true));
                 return UniqueFaceupSpell();
             }
@@ -1405,6 +1409,7 @@ namespace WindBot.Game.AI.Decks
             ClientCard target = Enemy.MonsterZone.GetShouldBeDisabledBeforeItUseEffectMonster();
             if (target != null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(target);
                 return UniqueFaceupSpell();
             }
@@ -1420,6 +1425,7 @@ namespace WindBot.Game.AI.Decks
                 }
                 if (target != null)
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(target);
                     return UniqueFaceupSpell();
                 }
@@ -1439,8 +1445,7 @@ namespace WindBot.Game.AI.Decks
             return false;
         }
         private bool Typhoonsummon()
-        {
-           
+        {           
             if (Bot.HasInMonstersZone(CardId.TopologicBomberDragon))
                 return false;
             if (Duel.Phase !=DuelPhase.Main1 && Duel.Phase!=DuelPhase.Main2) return false;
@@ -1454,6 +1459,7 @@ namespace WindBot.Game.AI.Decks
                 Bot.GetRemainingCount(CardId.BrandishMaidenRei, 3) > 0 &&
                 !(Bot.HasInHand(CardId.BrandishMaidenRei) && !summon_used))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.AreaZero);
                 return true;
             }
@@ -1465,11 +1471,13 @@ namespace WindBot.Game.AI.Decks
             {
                 if (Bot.HasInSpellZone(CardId.HerculesBase))
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(CardId.HerculesBase);
                     return true;
                 }
                 if (Bot.HasInSpellZone(CardId.MetalfoesFusion))
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(CardId.MetalfoesFusion);
                     return true;
                 }
@@ -1542,6 +1550,7 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectCard(GetDiscardHand());
                 AI.SelectNextCard(targets);
+                AI.SelectPlace(Zones.z2, 2);
                 return true;
             }
             foreach (ClientCard check in Enemy.GetSpells())
@@ -1550,7 +1559,8 @@ namespace WindBot.Game.AI.Decks
                     targets.Add(check);
             }
             if (DefaultOnBecomeTarget() && targets.Count>=2)
-            {                
+            {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(GetDiscardHand());
                 AI.SelectNextCard(targets);
                 return true;
@@ -1560,6 +1570,7 @@ namespace WindBot.Game.AI.Decks
                 AI.Utils.GetLastChainCard().HasType(CardType.Field)) &&
                 Duel.LastChainPlayer == 1)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(GetDiscardHand());
                 AI.SelectNextCard(targets);
                 return true;
@@ -1573,6 +1584,7 @@ namespace WindBot.Game.AI.Decks
                 (Bot.HasInHandOrHasInMonstersZone(CardId.BrandishMaidenRei) || 
                 Bot.HasInHandOrInSpellZone(CardId.HornetBit)))
                 {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.BrandishStartUpEngage);
                 return true;
             }
@@ -1581,6 +1593,7 @@ namespace WindBot.Game.AI.Decks
             AI.SelectCard(new[]{
                 CardId.MetalfoesFusion,               
             });
+            AI.SelectPlace(Zones.z2, 2);
             return true;
         }
 
@@ -1652,6 +1665,7 @@ namespace WindBot.Game.AI.Decks
                 return false;
             if(Enemy.HasInMonstersZone(CardId.Linkuriboh) && GetPlan())
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.Linkuriboh);
                 return true;
             }
@@ -1661,6 +1675,7 @@ namespace WindBot.Game.AI.Decks
             ClientCard target = AI.Utils.GetProblematicEnemyMonster(0, true);
                 if (target != null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(target);
                 return true;
             }
@@ -1668,6 +1683,7 @@ namespace WindBot.Game.AI.Decks
             if(SpellsCountInGrave()>=3 && Enemy.GetSpellCount()>=1 && Enemy.GetMonsterCount()>=1 &&
                  AI.Utils.GetBestEnemyMonster(true, true)!=null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(AI.Utils.GetBestEnemyMonster(true, true));
                 return true;
             }
@@ -1677,12 +1693,14 @@ namespace WindBot.Game.AI.Decks
             {
                 if (Enemy.GetMonsterCount() >= 2 && target.Attack>=1600)
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(target);
                     return true;
                 }
                 if (target.Attack<=2000)
                     return false;
                 {
+                    AI.SelectPlace(Zones.z2, 2);
                     AI.SelectCard(target);
                     return true;
                 }
@@ -1716,6 +1734,7 @@ namespace WindBot.Game.AI.Decks
 
             if (Bot.HasInSpellZone(CardId.HerculesBase))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.HerculesBase);
                 return true;
             }
@@ -1730,22 +1749,26 @@ namespace WindBot.Game.AI.Decks
             }
             if (target != null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(target);
                 return true;
             }
             
             if (Bot.HasInSpellZone(CardId.MetalfoesFusion))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.MetalfoesFusion);
                 return true;
             }
             if(Bot.LifePoints<=1500 && Bot.HasInSpellZone(CardId.SolemnStrike))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.SolemnStrike);
                 return true;
             }
             if(enemy_no_used_spell && Bot.HasInSpellZone(CardId.Typhoon))
             {
+                AI.SelectPlace(Zones.z2, 2);
                 AI.SelectCard(CardId.Typhoon);
                 return true;
             }
@@ -1788,7 +1811,7 @@ namespace WindBot.Game.AI.Decks
                     CardId.MultiRoll,
                     CardId.BrandishMaidenRei
                 });
-
+            AI.SelectPlace(Zones.z2, 2);
             return true;
         }
         private bool HornetBitEffectFirst_B()
@@ -1847,6 +1870,7 @@ namespace WindBot.Game.AI.Decks
                 return false;
             if (DefaultOnBecomeTarget() && Bot.GetMonstersExtraZoneCount()==0)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 Logger.DebugWriteLine("OnBecomeTargetHornetBitEffect");
                 return true;
             }               
@@ -2011,7 +2035,11 @@ namespace WindBot.Game.AI.Decks
             if(Card.Location==CardLocation.Hand)
             {
                 if (!Bot.HasInSpellZone(CardId.MultiRoll))
+                {
+                    AI.SelectPlace(Zones.z2, 2);
                     return true;
+                }
+                   
             }
             return false;
         }
@@ -2105,8 +2133,7 @@ namespace WindBot.Game.AI.Decks
                         AI.SelectCard(CardId.MetalfoesFusion);
                         return true;
                     }
-                }
-                
+                }                
             }
             return false;
         }
@@ -2138,6 +2165,7 @@ namespace WindBot.Game.AI.Decks
                 AI.Utils.ChainContainsCard(CardId.DarkHole) ||
                 AI.Utils.ChainContainsCard(_CardId.UltimateConductorTytanno))
             {
+                AI.SelectPlace(Zones.z5, 3);
                 Rei_eff_used = true;
                 BrandishMaidenReiSelectTarget();
                 return true;
@@ -2147,6 +2175,7 @@ namespace WindBot.Game.AI.Decks
             {
                 if (Bot.HasInHandOrInGraveyard(CardId.LordOfTheLair))
                 {
+                    AI.SelectPlace(Zones.z5, 3);
                     Rei_eff_used = true;
                     BrandishMaidenReiSelectTarget();
                     return true;
@@ -2157,6 +2186,7 @@ namespace WindBot.Game.AI.Decks
                 change = true;
             if ((Card.Attacked || change)&& Duel.Phase == DuelPhase.BattleStart)
             {
+                AI.SelectPlace(Zones.z5, 3);
                 Rei_eff_used = true;
                 BrandishMaidenReiSelectTarget();
                 return true;
@@ -2186,11 +2216,13 @@ namespace WindBot.Game.AI.Decks
                     CardId.BrandishMaidenHayate
                 });
                 }
+                AI.SelectPlace(Zones.z5, 3);
                 Rei_eff_used = true;
                 return true;
             }
             if (Duel.Phase == DuelPhase.Main2)
             {
+                AI.SelectPlace(Zones.z5, 3);
                 Rei_eff_used = true;
                 BrandishMaidenReiSelectTarget();
                 return true;
@@ -2257,6 +2289,7 @@ namespace WindBot.Game.AI.Decks
                 CardId.BrandishSkillJammingWave
             }))
             {
+                AI.SelectPlace(Zones.z5, 3);
                 KagariSummoned = true;
                 return true;
             }
@@ -2342,6 +2375,7 @@ namespace WindBot.Game.AI.Decks
                 {
                     if(check.Attack<1500)
                     {
+                        AI.SelectPlace(Zones.z5, 3);
                         ShizukuSummoned = true;
                         return true;
                     }
@@ -2351,6 +2385,7 @@ namespace WindBot.Game.AI.Decks
                 return false;
             if (AI.Utils.IsTurn1OrMain2())
             {
+                AI.SelectPlace(Zones.z5, 3);
                 ShizukuSummoned = true;
                 return true;
             }
@@ -2384,26 +2419,28 @@ namespace WindBot.Game.AI.Decks
                 Enemy.GetMonsterCount() == 0 && Duel.Turn > 1)
                 return false;
             if (Enemy.LifePoints<=1500 && Duel.Phase == DuelPhase.Main1)
-            {                
+            {
+                AI.SelectPlace(Zones.z5, 3);
                 HayateSummoned = true;
                 return true;
             }
             if (Bot.Hand.Count >= 6 && Enemy.GetMonsterCount() <= 1)
-            {
-                
+            {                
                 save_resource = true;
                 return false;
             }
             if (Bot.HasInMonstersZone(CardId.BrandishMaidenKagari) && 
                 !KagariSummoned && Bot.HasInExtra(CardId.BrandishMaidenKagari))
-            {                
+            {
+                AI.SelectPlace(Zones.z5, 3);
                 HayateSummoned = true;
                 return true;
             }
             if (AI.Utils.IsTurn1OrMain2())
                 return false;
             if (Enemy.HasInMonstersZone(_CardId.BlueEyesChaosMAXDragon,true) && !KagariSummoned)
-            {               
+            {
+                AI.SelectPlace(Zones.z5, 3);
                 HayateSummoned = true;
                 return true;
             }
@@ -2411,7 +2448,7 @@ namespace WindBot.Game.AI.Decks
                 Bot.GetRemainingCount(CardId.HerculesBase, 1) == 0 &&
                 Bot.HasInHandOrInSpellZoneOrInGraveyard(CardId.BrandishStartUpEngage) && SpellsCountInGrave()>=3)
                 return false;
-            
+            AI.SelectPlace(Zones.z5, 3);
             HayateSummoned = true;
             return true;
         }
@@ -2468,6 +2505,7 @@ namespace WindBot.Game.AI.Decks
                 return false;
             if (material_list.Count == 2)
             {
+                AI.SelectPlace(Zones.z5, 3);
                 Logger.DebugWriteLine("******NingirsuTheWorldChaliceWarrior");
                 return true;
             }                
@@ -2654,7 +2692,8 @@ namespace WindBot.Game.AI.Decks
 
         private bool HornetBitset()
         {
-            if (Duel.Turn > 1 && Duel.Phase != DuelPhase.Main2) return false;
+            if (Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;
             if (Bot.HasInSpellZone(CardId.HornetBit) || Bot.GetSpellCountWithoutField()>=4)
                 return false;
             if (Bot.Hand.Count > 6) return true;
@@ -2670,7 +2709,8 @@ namespace WindBot.Game.AI.Decks
 
         private bool WidowAnchorset()
         {
-            if (Duel.Turn > 1 && Duel.Phase != DuelPhase.Main2) return false;
+            if(Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;            
             if (Bot.GetSpellCountWithoutField() >= 4)
                 return false;
             return true;
@@ -2801,7 +2841,7 @@ namespace WindBot.Game.AI.Decks
                 return false;
             if(Card.Id==CardId.AreaZero || Card.Id==CardId.MultiRoll)
             {
-                if(Bot.HasInSpellZone(CardId.HerculesBase))
+                if(Bot.HasInSpellZone(CardId.HerculesBase) && Card.Location==CardLocation.SpellZone)
                 {
                     AI.SelectCard(CardId.HerculesBase);
                     return true;
@@ -2883,8 +2923,7 @@ namespace WindBot.Game.AI.Decks
             return base.OnSelectAttacker(attackers, defenders);
         }
         public override bool OnSelectYesNo(int desc)
-        {
-            
+        {            
             bool check = false;
             foreach(ClientCard m in Enemy.GetMonsters())
             {
@@ -3111,7 +3150,6 @@ namespace WindBot.Game.AI.Decks
         {
             return CuteCount() + NegateCount();
         }
-
         
         private bool BrandishMonsterRestart()
         {

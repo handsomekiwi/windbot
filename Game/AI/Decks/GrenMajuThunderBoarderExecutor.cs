@@ -70,7 +70,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.AntiSpellFragrance, AntiSpellFragranceeff);
             //counter
             AddExecutor(ExecutorType.Activate, CardId.AshBlossomAndJoyousSpring, AshBlossomAndJoyousSpringeff);
-            AddExecutor(ExecutorType.Activate, CardId.MaxxC, MaxxCeff);            
+            AddExecutor(ExecutorType.Activate, CardId.MaxxC, DefaultMaxxC);            
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence, InfiniteImpermanenceeff);
             AddExecutor(ExecutorType.Activate, CardId.SolemnWarning, DefaultSolemnWarning);
             AddExecutor(ExecutorType.Activate, CardId.SolemStrike, DefaultSolemnStrike);
@@ -194,11 +194,7 @@ namespace WindBot.Game.AI.Decks
             if (AI.Utils.GetLastChainCard().Id == CardId.UpstartGoblin)
                 return false;
             return Duel.LastChainPlayer == 1;
-        }
-        private bool MaxxCeff()
-        {
-            return Duel.Player == 1;
-        }
+        }       
 
         private bool EvenlyMatchedeff()
         {            
@@ -459,7 +455,7 @@ namespace WindBot.Game.AI.Decks
                 List<ClientCard> enemy_monster = Enemy.GetMonsters();
                 foreach (ClientCard m in enemy_monster)
                 {
-                    if (m.IsAttack() && !m.Attacked) total_atk += m.Attack;
+                    if (m.IsAttack()) total_atk += m.Attack;
                 }
                 if (total_atk >= Bot.LifePoints) return true;
             }
@@ -468,6 +464,8 @@ namespace WindBot.Game.AI.Decks
 
         private bool PhatomKnightsSwordeff()
         {
+            if (Card.IsFaceup())
+                return true;
             if(Duel.Phase==DuelPhase.BattleStart && Bot.BattlingMonster!=null && Enemy.BattlingMonster!=null)
             {                
                 if (Bot.BattlingMonster.Attack + 800 >= Enemy.BattlingMonster.GetDefensePower())
@@ -706,12 +704,12 @@ namespace WindBot.Game.AI.Decks
                 return true;            
             if (Card.Id == CardId.MacroCosmos && Bot.HasInSpellZone(CardId.MacroCosmos)) return false;
             if (Card.Id == CardId.AntiSpellFragrance && Bot.HasInSpellZone(CardId.AntiSpellFragrance)) return false;
-            if (CardOfDemiseeff_used)return true;
-            //if (Duel.Turn > 1 && Duel.Phase != DuelPhase.Main2) return false;
+            if (CardOfDemiseeff_used)return true;            
             if (Card.Id == CardId.EvenlyMatched && (Enemy.GetFieldCount() - Bot.GetFieldCount()) < 0) return false;
             if (Card.Id == CardId.AntiSpellFragrance && Bot.HasInSpellZone(CardId.AntiSpellFragrance)) return false;
             if (Card.Id == CardId.MacroCosmos && Bot.HasInSpellZone(CardId.MacroCosmos)) return false;
-            if (Duel.Turn > 1 && Duel.Phase != DuelPhase.Main2) return false;
+            if (Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;
             if (Card.Id == CardId.InfiniteImpermanence)
                 return Bot.GetFieldCount() > 0 && Bot.GetSpellCountWithoutField() < 4;
             if (Card.Id == CardId.Scapegoat)

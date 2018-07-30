@@ -71,6 +71,7 @@ namespace WindBot.Game.AI
             public const int MaxxC = 23434538;
             public const int LockBird = 94145021;
             public const int Ghost = 59438930;
+            public const int GhostBelle = 73642296;
             public const int EffectVeiler = 63845230;
             public const int GalaxySoldier = 46659709;
             public const int FlowerCardianLightflare = 87460579;
@@ -78,6 +79,9 @@ namespace WindBot.Game.AI
             public const int ApprenticeLllusionMagician = 30603688;
             public const int EternalSoul = 48680970;
             public const int MoonMirrorShield = 19508728;
+
+            public const int ImperialOrder = 61740673;
+            public const int NaturiaBeast = 33198837;
         }
         IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
@@ -790,6 +794,13 @@ namespace WindBot.Game.AI
             return true;
         }
         /// <summary>
+        /// Default MaxxC effect
+        /// </summary>
+        protected bool DefaultMaxxC()
+        {
+            return Duel.Player == 1;
+        }
+        /// <summary>
         /// Default AshBlossomAndJoyousSpring effect
         /// </summary>
         protected bool DefaultAshBlossomAndJoyousSpring()
@@ -807,6 +818,13 @@ namespace WindBot.Game.AI
         {
             if (AI.Utils.GetLastChainCard() != null && AI.Utils.GetLastChainCard().IsDisabled())
                 return false;
+            return DefaultTrap();
+        }
+        /// <summary>
+        /// Default GhostBelle effect
+        /// </summary>
+        protected bool DefaultGhostBelle()
+        {
             return DefaultTrap();
         }
         /// <summary>
@@ -846,6 +864,11 @@ namespace WindBot.Game.AI
                 if (AI.Utils.GetLastChainCard().Id == _CardId.AshBlossom)
                 {
                     AI.SelectCard(_CardId.AshBlossom);
+                    return UniqueFaceupSpell();
+                }
+                if (AI.Utils.GetLastChainCard().Id ==_CardId.GhostBelle)
+                {
+                    AI.SelectCard(_CardId.GhostBelle);
                     return UniqueFaceupSpell();
                 }
             }
@@ -1072,7 +1095,23 @@ namespace WindBot.Game.AI
                 return true;
             return false;
         }
-
+        /// <summary>
+        /// if spell will be neageted
+        /// </summary>
+        protected bool SpellWillBeNegated()
+        {
+            ClientCard card = null;
+            foreach (ClientCard check in Bot.GetSpells())
+            {
+                if (check.Id == _CardId.ImperialOrder && !check.IsDisabled())
+                    card = check;
+            }
+            if (card != null && card.IsFaceup())
+                return true;
+            if (Enemy.HasInSpellZone(_CardId.ImperialOrder, true) || Enemy.HasInMonstersZone(_CardId.NaturiaBeast,true))
+                return true;
+            return false;
+        }
         /// <summary>
         /// if spell/trap is the target or enermy activate HarpiesFeatherDuster
         /// </summary>
@@ -1175,7 +1214,24 @@ namespace WindBot.Game.AI
                 return true;
             return false;
         }
-
+        protected bool DefaultScapegoat()
+        {
+            if (SpellWillBeNegated()) return false;
+            if (Duel.Player == 0) return false;
+            if (Duel.Phase == DuelPhase.End) return true;
+            if (Duel.LastChainPlayer == 1 && DefaultOnBecomeTarget()) return true;
+            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
+            {
+                int total_atk = 0;
+                List<ClientCard> enemy_monster = Enemy.GetMonsters();
+                foreach (ClientCard m in enemy_monster)
+                {
+                    if (m.IsAttack()) total_atk += m.Attack;
+                }
+                if (total_atk >= Bot.LifePoints) return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Draw when we have Dark monster in hand,and banish random one. Can be overrided.
         /// </summary>
@@ -1194,6 +1250,7 @@ namespace WindBot.Game.AI
             }
             if (con != null)
             {
+                AI.SelectPlace(Zones.z2, 2);
                 return true;
             }
             return false;
@@ -1326,6 +1383,7 @@ namespace WindBot.Game.AI
                     _CardId.ThunderKingtheLightningstrikeKaiju,
                     
                 });
+            AI.SelectPlace(Zones.z2, 2);
             return DefaultDarkHole();
         }
 
