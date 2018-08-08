@@ -99,6 +99,7 @@
     <Compile Include="Game\AI\Decks\DragunityExecutor.cs" />
     <Compile Include="Game\AI\Decks\FrogExecutor.cs" />
     <Compile Include="Game\AI\Decks\HorusExecutor.cs" />
+    <Compile Include="Game\AI\Decks\PhantasmExecutor.cs" />
     <Compile Include="Game\AI\Decks\DoEveryThingExecutor.cs" />
     <Compile Include="Game\AI\Decks\OldSchoolExecutor.cs" />
     <Compile Include="Game\AI\Decks\Rank5Executor.cs" />
