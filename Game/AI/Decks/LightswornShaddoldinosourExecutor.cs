@@ -195,6 +195,9 @@ namespace WindBot.Game.AI.Decks
         bool ShaddollSquamata_used = false;
         bool ShaddollDragon_used = false;
         bool ShaddollHedgehog_used = false;
+        bool UltimateConductorTytannoeff_used = false;
+        bool UltimateConductorTytannoeff_check = false;
+        bool UltimateConductorTytannoeff_do = false;
         bool clowneff_used = false;
         bool MaxxC_used = false;
         public override void OnNewPhase()
@@ -219,6 +222,7 @@ namespace WindBot.Game.AI.Decks
             ShaddollSquamata_used = false;
             ShaddollDragon_used = false;
             ShaddollHedgehog_used = false;
+            UltimateConductorTytannoeff_used = false;
             clowneff_used = false;
         }
 
@@ -320,8 +324,12 @@ namespace WindBot.Game.AI.Decks
                             eff_count++;
                     foreach (ClientCard monster in check)
                         if ((monster.Attack >= 2500 || monster == Enemy.MonsterZone.GetDangerousMonster()) && !monster.HasType(CardType.Link))
+                        {
+                            UltimateConductorTytannoeff_check = true;
                             count++;
-                    if (count == 0 && eff_count < 2) return false;
+                        }
+                            
+                    if (count == 0 /*&& !UltimateConductorTytannoeff_do*/ && eff_count < 2) return false;
                 }
                 if (!Bot.HasInHand(targets))
                 {
@@ -329,6 +337,8 @@ namespace WindBot.Game.AI.Decks
                     return false;
                 }
                 AI.SelectCard(targets);
+                UltimateConductorTytannoeff_used = true;
+                UltimateConductorTytannoeff_do = false;
                 return true;
             }
             if (Duel.Phase == DuelPhase.BattleStart)
@@ -1367,6 +1377,18 @@ namespace WindBot.Game.AI.Decks
             if (attacker.Id == CardId.UltimateConductorTytanno && !attacker.IsDisabled() && defender.IsDefense())
                 attacker.RealPower = 9999;
             return base.OnPreBattleBetween(attacker, defender);
+        }
+
+        public override bool OnSelectYesNo(int desc)
+        {
+           /* if(desc==23 && !UltimateConductorTytannoeff_used && 
+                UltimateConductorTytannoeff_check && Bot.HasInMonstersZone(CardId.UltimateConductorTytanno))
+            {
+                UltimateConductorTytannoeff_check = false;
+                UltimateConductorTytannoeff_do = true;
+                return false;
+            }     */      
+            return base.OnSelectYesNo(desc);
         }
 
         public override bool OnSelectHand()

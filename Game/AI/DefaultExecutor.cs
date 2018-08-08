@@ -70,9 +70,11 @@ namespace WindBot.Game.AI
             public const int AshBlossom = 14558127;
             public const int MaxxC = 23434538;
             public const int LockBird = 94145021;
-            public const int Ghost = 59438930;
+            public const int GhostOgreAndSnowRabbit = 59438930;
             public const int GhostBelle = 73642296;
             public const int EffectVeiler = 63845230;
+            public const int CalledByTheGrave = 24224830;
+            public const int InfiniteImpermanence = 10045474;
             public const int GalaxySoldier = 46659709;
             public const int FlowerCardianLightflare = 87460579;
             public const int AmanoIwato = 32181268;
@@ -82,11 +84,12 @@ namespace WindBot.Game.AI
 
             public const int ImperialOrder = 61740673;
             public const int NaturiaBeast = 33198837;
+            public const int AntiSpellFragrance = 58921041;
         }
         IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
-        {
+        {            
             AddExecutor(ExecutorType.Activate, _CardId.ChickenGame, DefaultChickenGame);
         }
 
@@ -856,9 +859,9 @@ namespace WindBot.Game.AI
                     AI.SelectCard(_CardId.LockBird);
                     return UniqueFaceupSpell();
                 }
-                if (AI.Utils.GetLastChainCard().Id == _CardId.Ghost)
+                if (AI.Utils.GetLastChainCard().Id == _CardId.GhostOgreAndSnowRabbit)
                 {
-                    AI.SelectCard(_CardId.Ghost);
+                    AI.SelectCard(_CardId.GhostOgreAndSnowRabbit);
                     return UniqueFaceupSpell();
                 }
                 if (AI.Utils.GetLastChainCard().Id == _CardId.AshBlossom)
@@ -1095,10 +1098,12 @@ namespace WindBot.Game.AI
                 return true;
             return false;
         }
+
+       
         /// <summary>
         /// if spell will be neageted
         /// </summary>
-        protected bool SpellWillBeNegated()
+        protected bool DefaultSpellWillBeNegated()
         {
             ClientCard card = null;
             foreach (ClientCard check in Bot.GetSpells())
@@ -1109,6 +1114,20 @@ namespace WindBot.Game.AI
             if (card != null && card.IsFaceup())
                 return true;
             if (Enemy.HasInSpellZone(_CardId.ImperialOrder, true) || Enemy.HasInMonstersZone(_CardId.NaturiaBeast,true))
+                return true;
+            return false;
+        }
+        protected bool DefaultSpellMustSetFirst()
+        {
+            ClientCard card = null;
+            foreach (ClientCard check in Bot.GetSpells())
+            {
+                if (check.Id == _CardId.AntiSpellFragrance && !check.IsDisabled())
+                    card = check;
+            }
+            if (card != null && card.IsFaceup())
+                return true;
+            if (Enemy.HasInSpellZone(_CardId.AntiSpellFragrance, true))
                 return true;
             return false;
         }
@@ -1216,7 +1235,7 @@ namespace WindBot.Game.AI
         }
         protected bool DefaultScapegoat()
         {
-            if (SpellWillBeNegated()) return false;
+            if (DefaultSpellWillBeNegated()) return false;
             if (Duel.Player == 0) return false;
             if (Duel.Phase == DuelPhase.End) return true;
             if (Duel.LastChainPlayer == 1 && DefaultOnBecomeTarget()) return true;

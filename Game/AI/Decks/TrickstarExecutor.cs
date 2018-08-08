@@ -572,7 +572,7 @@ namespace WindBot.Game.AI.Decks
         {
             if (Duel.LastChainPlayer == 1)
             {
-                AI.SelectCard(Useless_List());
+                AI.SelectCard(Useless_List());                
                 return true;
             }
             return false;
@@ -1410,6 +1410,7 @@ namespace WindBot.Game.AI.Decks
         public bool Phoneix_eff()
         {
             AI.SelectCard(Useless_List());
+            AI.SelectCard(AI.Utils.GetBestEnemySpell());
             return true;
         }
 

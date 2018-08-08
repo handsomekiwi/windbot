@@ -1510,14 +1510,13 @@ namespace WindBot.Game.AI.Decks
             
             foreach (ClientCard check in Enemy.GetSpells())
             {                
-                if (check.HasType(CardType.Continuous) || check.HasType(CardType.Field))
+                if (check.HasType(CardType.Continuous) || check.HasType(CardType.Field) && check.Id!=CardId.AreaZero)
                 {
                     targets.Add(check);
                     AI.SelectCard(check);
                     return UniqueFaceupSpell();
                 }
-            }
-           
+            }           
             foreach (ClientCard check in Enemy.GetSpells())
             {
                 targets.Add(check);
@@ -2541,7 +2540,7 @@ namespace WindBot.Game.AI.Decks
             return false;
         }
         private bool LordOfTheLaireff()
-        {
+        {            
             if (Card.Location == CardLocation.Hand || Card.Location == CardLocation.Grave)
             {
                 if (lord_can_do)

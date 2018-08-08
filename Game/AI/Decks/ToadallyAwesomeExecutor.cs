@@ -40,6 +40,9 @@ namespace WindBot.Game.AI.Decks
             public const int BookOfMoon = 14087893;
             public const int CallOfTheHaunted = 97077563;
             public const int TorrentialTribute = 53582587;
+
+            public const int DevirrtualCandoll = 53303460;
+            public const int DeviritualTalismandra = 80701178;
         }
 
         public ToadallyAwesomeExecutor(GameAI ai, Duel duel)
@@ -106,7 +109,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, OtherTrapEffect);
             AddExecutor(ExecutorType.Activate, OtherMonsterEffect);
         }
-
+        bool NotTaken = false;
         public override bool OnSelectHand()
         {
             return true;
@@ -301,7 +304,7 @@ namespace WindBot.Game.AI.Decks
         }
 
         private bool ToadallyAwesomeEffect()
-        {
+        {            
             if (Duel.CurrentChain.Count > 0)
             {
                 // negate effect, select a cost for it
@@ -317,7 +320,7 @@ namespace WindBot.Game.AI.Decks
                 {
                     if (suitableCost.Contains(monster.Id))
                     {
-                        AI.SelectCard(monster);
+                        AI.SelectCard(monster);                        
                         return true;
                     }
                 }
@@ -326,7 +329,7 @@ namespace WindBot.Game.AI.Decks
                     foreach (ClientCard monster in monsters)
                     {
                         if (monster.Id == CardId.DupeFrog)
-                        {
+                        {                            
                             AI.SelectCard(monster);
                             return true;
                         }
@@ -338,7 +341,7 @@ namespace WindBot.Game.AI.Decks
                     foreach (ClientCard monster in hands)
                     {
                         if (monster.Id == CardId.GraydleSlimeJr)
-                        {
+                        {                           
                             AI.SelectCard(monster);
                             return true;
                         }
@@ -349,7 +352,7 @@ namespace WindBot.Game.AI.Decks
                     foreach (ClientCard monster in hands)
                     {
                         if (monster.Id == CardId.DupeFrog)
-                        {
+                        {                           
                             AI.SelectCard(monster);
                             return true;
                         }
@@ -358,13 +361,13 @@ namespace WindBot.Game.AI.Decks
                 foreach (ClientCard monster in hands)
                 {
                     if (monster.Id == CardId.Ronintoadin || monster.Id == CardId.DupeFrog)
-                    {
+                    {                       
                         AI.SelectCard(monster);
                         return true;
                     }
                 }
                 foreach (ClientCard monster in hands)
-                {
+                {                    
                     AI.SelectCard(monster);
                     return true;
                 }
@@ -576,6 +579,24 @@ namespace WindBot.Game.AI.Decks
                         CardId.PriorOfTheIceBarrier,
                         CardId.SwapFrog
                     });
+        }
+
+        public override bool OnSelectYesNo(int desc)
+        {
+            if (Duel.CurrentChain.Count > 0)
+            {
+                Logger.DebugWriteLine("Duel.CurrentChain[0]" + Duel.CurrentChain[0].Name);
+                if (Duel.CurrentChain[0].Id == CardId.DeviritualTalismandra ||
+                    Duel.CurrentChain[0].Id == CardId.DevirrtualCandoll)
+                    NotTaken = true;
+            }//NEED DO: lastchaincard=null
+            if (desc == AI.Utils.GetStringId(CardId.ToadallyAwesome, 3)/* && NotTaken*/)
+            {
+                NotTaken = false;
+                return false;
+            }
+                
+                return base.OnSelectYesNo(desc);
         }
     }
 }

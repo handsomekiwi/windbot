@@ -28,6 +28,7 @@ namespace WindBot.Game
         public int LinkMarker { get; private set; }
         public int BaseAttack { get; private set; }
         public int BaseDefense { get; private set; }
+        public int Equip { get; private set; }
         public int RealPower { get; set; }
         public List<int> Overlays { get; private set; }
         public int Owner { get; private set; }
@@ -108,7 +109,7 @@ namespace WindBot.Game
             if ((flag & (int)Query.ReasonCard) != 0)
                 packet.ReadInt32(); // Int8 * 4
             if ((flag & (int)Query.EquipCard) != 0)
-                packet.ReadInt32(); // Int8 * 4
+                Equip = packet.ReadInt32(); // Int8 * 4 kiwi need test
             if ((flag & (int)Query.TargetCard) != 0)
             {
                 int count = packet.ReadInt32();
