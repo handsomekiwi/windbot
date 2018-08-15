@@ -1092,7 +1092,7 @@ namespace WindBot.Game
                 Logger.WriteLine(Bot_Spell);
                 Logger.WriteLine("---------- Zone ----------");
             }            
-           Logger.DebugWriteLine("OnUpdateCard");
+          // Logger.DebugWriteLine("OnUpdateCard");
         }
 
         private void OnUpdateData(BinaryReader packet)
