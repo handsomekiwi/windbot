@@ -899,7 +899,7 @@ namespace WindBot.Game.AI
                         break;
                     }
                 }
-                if (target != null)
+                if (target != null && !target.IsDisabled())
                 {
                     AI.SelectCard(target);
                     return true;
@@ -999,7 +999,7 @@ namespace WindBot.Game.AI
         /// </summary>
         protected bool DefaultHarpiesFeatherDusterFirst()
         {
-            return Enemy.GetSpellCount() >= 2;
+            return (Enemy.GetSpellCount() >= 2 && !DefaultSpellWillBeNegated());
         }
 
         /// <summary>

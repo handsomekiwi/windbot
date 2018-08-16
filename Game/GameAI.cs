@@ -277,8 +277,7 @@ namespace WindBot.Game
             if (hint == HINTMSG_FMATERIAL || hint == HINTMSG_SMATERIAL || hint == HINTMSG_XMATERIAL || hint == HINTMSG_LMATERIAL)
             {
                 if (m_materialSelector != null)
-                {
-                    Logger.DebugWriteLine("m_materialSelector");
+                {                    
                     selector = m_materialSelector;
                 }
                 else
