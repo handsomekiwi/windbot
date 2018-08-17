@@ -49,25 +49,80 @@ namespace WindBot.Game.AI.Decks
             public const int MissusRadiant = 3987233;
             public const int LinkSpider = 98978921;
             public const int Linkuriboh = 41999284;
+
+            public const int ElShaddollWinda = 94977269;
         }
 
         public PhantasmExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
         {
             //counter
-            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);            
+            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);
+            AddExecutor(ExecutorType.Activate, CardId.StarlightRoad, PreventFeatherDustereff);
+            AddExecutor(ExecutorType.Activate, CardId.TheHugeRevolutionIsOver, PreventFeatherDustereff);
             AddExecutor(ExecutorType.Activate, _CardId.GhostBelle, DefaultGhostBelle);
             AddExecutor(ExecutorType.Activate, _CardId.CalledByTheGrave, DefaultCalledByTheGrave);
             AddExecutor(ExecutorType.Activate, _CardId.EffectVeiler, DefaultEffectVeiler);
             AddExecutor(ExecutorType.Activate, _CardId.InfiniteImpermanence, DefaultInfiniteImpermanence);
             AddExecutor(ExecutorType.Activate, _CardId.AshBlossom, DefaultAshBlossomAndJoyousSpring);
             AddExecutor(ExecutorType.Activate, _CardId.GhostOgreAndSnowRabbit, DefaultGhostOgreAndSnowRabbit);
-            AddExecutor(ExecutorType.SpSummon);
-            AddExecutor(ExecutorType.Activate, DefaultDontChainMyself);
-            AddExecutor(ExecutorType.SummonOrSet);
-            AddExecutor(ExecutorType.Repos, DefaultMonsterRepos);
-            AddExecutor(ExecutorType.SpellSet);
+
+            //trap activate  
+            AddExecutor(ExecutorType.Activate, CardId.SeaStealthAttack, SeaStealthAttackeff);
+            AddExecutor(ExecutorType.Activate, CardId.PhantasmSprialBattle, PhantasmSprialBattleeff);
+            AddExecutor(ExecutorType.Activate, CardId.PhantasmSpiralPower, PhantasmSpiralPowereff);
+            AddExecutor(ExecutorType.Activate, CardId.DrowningMirrorForce, DrowningMirrorForceeff);
+            AddExecutor(ExecutorType.Activate, CardId.GozenMatch, GozenMatcheff);
+            AddExecutor(ExecutorType.Activate, CardId.SkillDrain, SkillDraineff);
+            AddExecutor(ExecutorType.Activate, CardId.Metaverse, Metaverseeff);
+            //sp
+            AddExecutor(ExecutorType.SpSummon, CardId.BorrelswordDragon, BorrelswordDragonsp);
+            AddExecutor(ExecutorType.Activate, CardId.BorrelswordDragon, BorrelswordDragoneff);           
+            AddExecutor(ExecutorType.SpSummon, CardId.MissusRadiant, MissusRadiantsp);
+            AddExecutor(ExecutorType.Activate, CardId.MissusRadiant, MissusRadianteff);
+            AddExecutor(ExecutorType.Activate, CardId.Linkuriboh, Linkuriboheff);
+            AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh, Linkuribohsp);
+            //first           
+            AddExecutor(ExecutorType.Activate, CardId.HarpieFeatherDuster, DefaultHarpiesFeatherDusterFirst);
+            AddExecutor(ExecutorType.Activate, CardId.FossilDig, FossilDigeff);           
+            AddExecutor(ExecutorType.Activate, CardId.Terraforming, Terraformingeff);
+            AddExecutor(ExecutorType.Activate, CardId.PotOfDuality, PotOfDualityeff);
+            AddExecutor(ExecutorType.Activate, CardId.PotOfDesires, PotOfDesireseff);
+            AddExecutor(ExecutorType.Activate, CardId.PacifisThePhantasmCity, PacifisThePhantasmCityeff);
+            //summon
+            AddExecutor(ExecutorType.Summon, CardId.MegalosmasherX, MegalosmasherXsummon);
+            //sp
+            AddExecutor(ExecutorType.SpSummon, CardId.EaterOfMillions, EaterOfMillionssp);
+            AddExecutor(ExecutorType.Activate, CardId.EaterOfMillions, EaterOfMillionseff);
+            //other
+
+            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, Scapegoateff);
+            AddExecutor(ExecutorType.SpellSet, CardId.SeaStealthAttack, NoSetAlreadyDone);
+            AddExecutor(ExecutorType.SpellSet, CardId.StarlightRoad, StarlightRoadset);
+            AddExecutor(ExecutorType.SpellSet, CardId.TheHugeRevolutionIsOver, TheHugeRevolutionIsOverset);
+            AddExecutor(ExecutorType.SpellSet, CardId.DrowningMirrorForce);
+            AddExecutor(ExecutorType.SpellSet, CardId.InfiniteImpermanence, InfiniteImpermanenceset);
+            AddExecutor(ExecutorType.SpellSet, CardId.Scapegoat, NoSetAlreadyDone);
+            AddExecutor(ExecutorType.SpellSet, CardId.GozenMatch, NoSetAlreadyDone);
+            AddExecutor(ExecutorType.SpellSet, CardId.SkillDrain, NoSetAlreadyDone);
+            AddExecutor(ExecutorType.SpellSet, CardId.Metaverse);
+            AddExecutor(ExecutorType.SpellSet, SpellSeteff);
+            AddExecutor(ExecutorType.Activate, CardId.CardOfDemise, CardOfDemiseeff);
+            AddExecutor(ExecutorType.Repos, MonsterRepos);
         }
+        bool summon_used = false;
+        bool CardOfDemiseeff_used = false;
+        public override void OnNewTurn()
+        {
+            summon_used = false;
+            CardOfDemiseeff_used = false;
+            base.OnNewTurn();
+        }
+        private bool PreventFeatherDustereff()
+        {
+            return Duel.LastChainPlayer == 1;          
+        }
+
         private bool ToBattlePhaseeff()
         {           
             if (Enemy.GetMonsterCount() == 0)
@@ -81,5 +136,496 @@ namespace WindBot.Game.AI.Decks
             return false;
         }
 
+        private bool PhantasmSprialBattleeff()
+        {
+            if (DefaultOnBecomeTarget())
+            {
+                AI.SelectCard(AI.Utils.GetBestEnemyCard(false,true));
+                return true;
+            }
+            if(Bot.GetMonsterCount()>0 && !Bot.HasInSpellZone(CardId.SeaStealthAttack) &&
+                AI.Utils.IsOneEnemyBetterThanValue(2000,true))
+            {
+                AI.SelectCard(AI.Utils.GetBestEnemyMonster(true,true));
+                return UniqueFaceupSpell();
+            }
+            if (AI.Utils.GetProblematicEnemyCard(9999,true)!=null)
+            {
+                if (AI.Utils.GetProblematicEnemyCard(9999, true).Id == CardId.ElShaddollWinda &&
+                    !AI.Utils.GetProblematicEnemyCard(9999, true).IsDisabled())
+                    return false;
+                AI.SelectCard(AI.Utils.GetProblematicEnemyCard(9999, true));                
+                return UniqueFaceupSpell();
+            }
+            return false;
+        }
+
+        private bool PhantasmSpiralPowereff()
+        {
+            if (DefaultOnBecomeTarget()) return true;
+            if(Enemy.HasInMonstersZone(CardId.ElShaddollWinda))
+            {
+                AI.SelectCard(CardId.ElShaddollWinda);
+                return true;
+            }
+            return DefaultInfiniteImpermanence() && UniqueFaceupSpell();
+        }
+
+        private bool DrowningMirrorForceeff()
+        {
+            int count = 0;
+            foreach(ClientCard m in Enemy.GetMonsters())
+            {
+                if (m.IsAttack()) count++;                    
+            }
+            return count >= 2;
+        }
+
+        private bool GozenMatcheff()
+        {
+            if (DefaultOnBecomeTarget()) return true;
+            int dark_count = 0;
+            int Divine_count = 0;
+            int Earth_count = 0;
+            int Fire_count = 0;
+            int Light_count = 0;
+            int Water_count = 0;
+            int Wind_count = 0;
+            foreach (ClientCard m in Enemy.GetMonsters())
+            {
+                if (m.HasAttribute(CardAttribute.Dark)) dark_count++;
+                if (m.HasAttribute(CardAttribute.Divine)) Divine_count++;
+                if (m.HasAttribute(CardAttribute.Earth)) Earth_count++;
+                if (m.HasAttribute(CardAttribute.Fire)) Fire_count++;
+                if (m.HasAttribute(CardAttribute.Light)) Light_count++;
+                if (m.HasAttribute(CardAttribute.Water)) Water_count++;
+                if (m.HasAttribute(CardAttribute.Wind)) Wind_count++;
+            }
+            return ((dark_count + Divine_count + Earth_count + Fire_count + Light_count + Water_count + Wind_count) >= 2 && UniqueFaceupSpell());
+        }
+
+        private bool SkillDraineff()
+        {
+            if (Duel.LastChainPlayer == 1 && AI.Utils.GetLastChainCard().Location == CardLocation.MonsterZone)
+                return UniqueFaceupSpell();
+            return false;
+        }
+
+        private bool Metaverseeff()
+        {
+            if (!Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
+            {
+                AI.SelectOption(1);
+                return UniqueFaceupSpell();
+            }
+            else
+            {
+                AI.SelectOption(0);
+                return UniqueFaceupSpell();                    
+            }
+        }
+
+        private bool CardOfDemiseeff()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            AI.SelectPlace(Zones.z2, 2);
+            if(Card.Location==CardLocation.Hand)
+            {
+                if (Bot.Hand.Count <= 1 && Bot.GetSpellCountWithoutField() <= 3)
+                {
+                    CardOfDemiseeff_used = true;
+                    return true;
+                }
+            }
+            else
+            {
+                if (Bot.Hand.Count <= 1 && Bot.GetSpellCountWithoutField() <= 4)
+                {
+                    CardOfDemiseeff_used = true;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool FossilDigeff()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if (CardOfDemiseeff_used && summon_used) return false;
+            return true;
+        }
+
+        private bool PotOfDualityeff()
+        {
+            if(!Bot.HasInHandOrInSpellZone(CardId.PacifisThePhantasmCity) &&
+                !Bot.HasInHandOrInSpellZone(CardId.Metaverse))
+            {
+                AI.SelectCard(new[] {
+                CardId.PacifisThePhantasmCity,
+                CardId.Terraforming,
+                CardId.Metaverse,
+                CardId.CardOfDemise,
+                CardId.Scapegoat});
+            }
+            else if(!Bot.HasInHandOrInSpellZone(CardId.SeaStealthAttack))
+            {
+                AI.SelectCard(new[] {
+                CardId.SeaStealthAttack,                
+                CardId.CardOfDemise,
+                CardId.PotOfDesires,
+                CardId.Scapegoat});
+            }
+            else
+            {
+                AI.SelectCard(new[] {                
+                CardId.CardOfDemise,
+                CardId.PotOfDesires,
+                CardId.Scapegoat});
+            }
+            return true;
+        }
+        private bool Terraformingeff()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if (CardOfDemiseeff_used && Bot.HasInSpellZone(CardId.PacifisThePhantasmCity)) return false;
+            return true;
+        }
+        
+        private bool PacifisThePhantasmCityeff()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if(Card.Location==CardLocation.Hand)
+            {
+                if (Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
+                    return false;
+                return true;
+            }
+            else
+            {
+                AI.SelectPlace(Zones.z1 | Zones.z3);
+                AI.SelectCard(CardId.PhantasmSprialBattle);
+                return true;
+            }
+        }
+
+        private bool MegalosmasherXsummon()
+        {
+            AI.SelectPlace(Zones.z1 | Zones.z3);
+            summon_used = true;
+            return true;
+        }
+
+        private bool BorrelswordDragonsp()
+        {
+           
+            if (!Bot.HasInMonstersZone(CardId.MissusRadiant))
+                return false;
+            IList<ClientCard> material_list = new List<ClientCard>();
+            foreach (ClientCard m in Bot.GetMonsters())
+            {
+                if (m.Id == CardId.MissusRadiant)
+                {
+                    material_list.Add(m);
+                    break;
+                }
+            }
+            foreach (ClientCard m in Bot.GetMonsters())
+            {
+                if (m.Id == CardId.Linkuriboh || m.Id == CardId.LinkSpider)
+                {
+                    material_list.Add(m);
+                    if (material_list.Count == 3)
+                        break;
+                }
+            }
+            if (material_list.Count == 3)
+            {
+                AI.SelectMaterials(material_list);
+                return true;
+            }
+            return false;
+        }
+
+        private bool BorrelswordDragoneff()
+        {
+            if (ActivateDescription == AI.Utils.GetStringId(CardId.BorrelswordDragon, 0))
+            {               
+                if (AI.Utils.IsChainTarget(Card) && AI.Utils.GetBestEnemyMonster(true, true) != null)
+                {
+                    AI.SelectCard(AI.Utils.GetBestEnemyMonster(true, true));
+                    return true;
+                }
+                if (Duel.Player == 1 && Bot.BattlingMonster == Card)
+                {
+                    AI.SelectCard(Enemy.BattlingMonster);
+                    return true;
+                }
+                if (Duel.Player == 1 && Bot.BattlingMonster != null &&
+                    (Enemy.BattlingMonster.Attack - Bot.BattlingMonster.Attack) >= Bot.LifePoints)
+                {
+                    AI.SelectCard(Enemy.BattlingMonster);
+                    return true;
+                }
+                if (Duel.Player == 0 && Duel.Phase == DuelPhase.BattleStart)
+                {
+                    foreach (ClientCard check in Enemy.GetMonsters())
+                    {
+                        if (check.IsAttack())
+                        {
+                            AI.SelectCard(check);
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            return true;
+        }
+        private bool EaterOfMillionssp()
+        {
+            if (Bot.MonsterZone[1] == null)
+                AI.SelectPlace(Zones.z1);
+            else
+                AI.SelectPlace(Zones.z3);
+            if (Enemy.HasInMonstersZone(CardId.KnightmareGryphon, true)) return false;         
+            if (AI.Utils.GetProblematicEnemyMonster() == null && Bot.ExtraDeck.Count < 5) return false;
+            if (Bot.GetMonstersInMainZone().Count >= 5) return false;
+            if (AI.Utils.IsTurn1OrMain2()) return false;
+            AI.SelectPosition(CardPosition.FaceUpAttack);            
+            AI.SelectCard(new[] {
+            CardId.TopologicBomberDragon,
+            CardId.TopologicTrisbaena,
+            CardId.KnightmareGryphon,
+            CardId.SummonSorceress,
+            CardId.BorreloadDragon});
+            return true;
+        }
+
+        private bool EaterOfMillionseff()
+        {
+            if (Enemy.BattlingMonster.HasPosition(CardPosition.Attack) && (Bot.BattlingMonster.Attack - Enemy.BattlingMonster.GetDefensePower() >= Enemy.LifePoints)) return false;
+            return true;
+        }
+
+        private bool MissusRadiantsp()
+        {
+            IList<ClientCard> material_list = new List<ClientCard>();
+            foreach (ClientCard monster in Bot.GetMonsters())
+            {
+                if (monster.HasAttribute(CardAttribute.Earth) && monster.Level == 1 && monster.Id != CardId.EaterOfMillions)
+                    material_list.Add(monster);
+                if (material_list.Count == 2) break;
+            }
+            if (material_list.Count < 2) return false;
+            if (Bot.HasInMonstersZone(CardId.MissusRadiant)) return false;
+            AI.SelectMaterials(material_list);
+            if ((Bot.MonsterZone[0] == null || Bot.MonsterZone[0].Level==1) &&
+                (Bot.MonsterZone[2] == null || Bot.MonsterZone[2].Level == 1)&&
+                Bot.MonsterZone[5] == null)
+                AI.SelectPlace(Zones.z5);
+            else
+                AI.SelectPlace(Zones.z6);
+            return true;
+        }
+
+        private bool MissusRadianteff()
+        {
+            AI.SelectCard(new[]
+           {              
+                CardId.MissusRadiant,
+            });
+            return true;
+        }
+
+        private bool Linkuribohsp()
+        {
+            foreach (ClientCard c in Bot.GetMonsters())
+            {
+                if (c.Id != CardId.EaterOfMillions && c.Id != CardId.Linkuriboh && c.Level == 1)
+                {
+                    AI.SelectMaterials(c);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private bool Linkuriboheff()
+        {
+            if (Duel.LastChainPlayer == 0 && AI.Utils.GetLastChainCard().Id == CardId.Linkuriboh) return false;
+            return true;
+        }
+        private bool SeaStealthAttackeff()
+        {
+            if ((Card.IsFacedown() && Bot.HasInHandOrInSpellZoneOrInGraveyard(CardId.PacifisThePhantasmCity)) || DefaultOnBecomeTarget())
+            {
+                if (!Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
+                {
+                    if(Bot.HasInGraveyard(CardId.PacifisThePhantasmCity))
+                    {
+                        foreach (ClientCard s in Bot.GetGraveyardSpells())
+                        {
+                            if (s.Id == CardId.PacifisThePhantasmCity)
+                            {
+                                AI.SelectYesNo(true);
+                                AI.SelectCard(s);
+                                break;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        foreach (ClientCard s in Bot.Hand)
+                        {
+                            if (s.Id == CardId.PacifisThePhantasmCity)
+                            {
+                                AI.SelectYesNo(true);
+                                AI.SelectCard(s);
+                                break;
+                            }
+                        }
+                    }
+
+                }
+                else
+                    AI.SelectYesNo(false);
+                return UniqueFaceupSpell();
+            }
+            else if(Card.IsFaceup())
+            {
+                ClientCard target = null;
+                foreach(ClientCard s in Bot.GetSpells())
+                {
+                    if (s.Id == CardId.PacifisThePhantasmCity)
+                        target = s;
+                }
+                if (target != null && AI.Utils.IsChainTarget(target)) return true;
+                if (DefaultOnBecomeTarget()) return true;
+            }
+            return false;
+        }   
+
+        private bool PotOfDesireseff()
+        {
+            return Bot.Deck.Count >= 18;
+        }
+
+        private bool Scapegoateff()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if (Duel.Player == 0) return false;
+            if (Duel.Phase == DuelPhase.End) return true;
+            if (DefaultOnBecomeTarget()) return true;
+            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
+            {
+                int total_atk = 0;
+                List<ClientCard> enemy_monster = Enemy.GetMonsters();
+                foreach (ClientCard m in enemy_monster)
+                {
+                    if (m.IsAttack()) total_atk += m.Attack;
+                }
+                if (total_atk >= Bot.LifePoints) return true;
+            }
+            return false;
+        }
+       
+        private bool StarlightRoadset()
+        {
+            if (Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;
+            if (Bot.HasInSpellZone(CardId.TheHugeRevolutionIsOver)) return false;
+            return true;
+        }
+
+        private bool TheHugeRevolutionIsOverset()
+        {
+            if (Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;
+            if (Bot.HasInSpellZone(CardId.StarlightRoad)) return false;
+            return true;
+        }
+
+        private bool InfiniteImpermanenceset()
+        {
+            return !Bot.IsFieldEmpty();
+        }
+        
+        private bool NoSetAlreadyDone()
+        {
+            if (Duel.Turn > 1 && Duel.Phase == DuelPhase.Main1 && Bot.HasAttackingMonster())
+                return false;
+            if (Bot.HasInSpellZone(Card.Id)) return false;
+            return true;
+        }
+
+        private bool SpellSeteff()
+        { 
+            if (Card.HasType(CardType.Field)) return false;
+            if (CardOfDemiseeff_used) return true;
+            if(Bot.HasInHandOrInSpellZone(CardId.CardOfDemise) && !CardOfDemiseeff_used)
+            {
+                int hand_spell_count = 0;
+                foreach(ClientCard s in Bot.Hand)
+                {
+                    if (s.HasType(CardType.Trap) || s.HasType(CardType.Spell) && !s.HasType(CardType.Field))
+                        hand_spell_count++;
+                }
+                int zone_count = 5 - Bot.GetSpellCountWithoutField();
+                return zone_count- hand_spell_count >= 1;
+            }
+            if(Card.Id==CardId.PhantasmSprialBattle || Card.Id==CardId.PhantasmSpiralPower)
+            {
+                if (Bot.HasInMonstersZone(CardId.MegalosmasherX) &&
+                    !Bot.HasInHandOrInSpellZone(CardId.PacifisThePhantasmCity) &&
+                    !Bot.HasInHandOrInSpellZone(CardId.Metaverse))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool MonsterRepos()
+        {
+            if (Card.Level >= 5)
+            {
+                foreach (ClientCard s in Bot.GetSpells())
+                {
+                    if (s.IsFaceup() && s.Id == CardId.SeaStealthAttack &&
+                        Bot.HasInSpellZone(CardId.PacifisThePhantasmCity) &&
+                        Card.IsAttack())
+                        return false;
+                }
+            }
+            if (Card.Id == CardId.EaterOfMillions && !Card.IsDisabled() && Card.IsAttack())
+                return false;
+            return DefaultMonsterRepos();
+        }
+
+        public override bool OnPreBattleBetween(ClientCard attacker, ClientCard defender)
+        {            
+            if(attacker.Level>=5)
+            {
+                foreach(ClientCard s in Bot.GetSpells())
+                {
+                    if (s.IsFaceup() && s.Id == CardId.SeaStealthAttack && Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
+                        attacker.RealPower = 9999;
+                }
+            }
+            return base.OnPreBattleBetween(attacker, defender);
+        }
+
+        public override ClientCard OnSelectAttacker(IList<ClientCard> attackers, IList<ClientCard> defenders)
+        {
+            for (int i = 0; i < attackers.Count; ++i)
+            {
+                ClientCard attacker = attackers[i];
+                if (attacker.Id == CardId.EaterOfMillions) return attacker;
+            }
+            return null;
+        }
+
+        public override bool OnSelectHand()
+        {
+            return true;
+        }
     }
 }
