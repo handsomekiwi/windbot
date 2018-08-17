@@ -490,75 +490,8 @@ namespace WindBot.Game
 
         private void OnNewPhase(BinaryReader packet)
         {
-            _duel.Phase = (DuelPhase)packet.ReadInt16();
-            
-           /* if (_duel.Phase == DuelPhase.End && _duel.Player==1)
-            {
-                Logger.DebugWriteLine("    DuelPhase.End                      ");
-                Logger.DebugWriteLine("*********Bot Hand*********");
-                foreach (ClientCard card in _duel.Fields[0].Hand)
-                {
-                    Logger.DebugWriteLine(card.Name);
-                }
-                Logger.DebugWriteLine("*********Bot Hand*********");
-                Logger.DebugWriteLine("                          ");
-                string Bot_Spell = " | ";
-                for (int i = 0; i < 5; i++)
-                {
-                    if (_duel.Fields[0].SpellZone[i] != null)
-                        Bot_Spell += _duel.Fields[0].SpellZone[i].Name.ToString();
-                    Bot_Spell += " | ";
-                }
-                string Bot_MainMonster = " | ";
-                for (int i = 0; i < 5; i++)
-                {
-                    if (_duel.Fields[0].MonsterZone[i] != null)
-                        Bot_MainMonster += _duel.Fields[0].MonsterZone[i].Name.ToString();
-                    Bot_MainMonster += " | ";
-                }
-                string bot_s_5 = null;
-                string bot_m_5 = null;
-                string bot_m_6 = null;
-                if (_duel.Fields[0].SpellZone[5] != null)
-                    bot_s_5 = _duel.Fields[0].SpellZone[5].Name;
-                if (_duel.Fields[0].MonsterZone[5] != null)
-                    bot_m_5 = _duel.Fields[0].MonsterZone[5].Name;
-                if (_duel.Fields[0].MonsterZone[6] != null)
-                    bot_m_6 = _duel.Fields[0].MonsterZone[6].Name;
-                //enemy
-                string Enemy_Spell = " | ";
-                for (int i = 4; i >= 0; i--)
-                {
-                    if (_duel.Fields[1].SpellZone[i] != null)
-                        Enemy_Spell += (_duel.Fields[1].SpellZone[i].Name ?? "UnKnowCard");
-                    Enemy_Spell += " | ";
-                }
-                string Enemy_MainMonster = " | ";
-                for (int i = 4; i >= 0; i--)
-                {
-                    if (_duel.Fields[1].MonsterZone[i] != null)
-                        Enemy_MainMonster += (_duel.Fields[1].MonsterZone[i].Name ?? "UnKnowCard");
-                    Enemy_MainMonster += " | ";
-                }
-                string enemy_m_5 = null;
-                string enemy_m_6 = null;
-                string enemy_s_5 = null;
-                if (_duel.Fields[1].MonsterZone[5] != null)
-                    enemy_m_5 = (_duel.Fields[1].MonsterZone[5].Name ?? "UnKnowCard");
-                if (_duel.Fields[1].MonsterZone[6] != null)
-                    enemy_m_6 = (_duel.Fields[1].MonsterZone[6].Name ?? "UnKnowCard");
-                if (_duel.Fields[1].SpellZone[5] != null)
-                    enemy_s_5 = (_duel.Fields[1].SpellZone[5].Name ?? "UnKnowCard");
-
-                Logger.WriteLine("---------- Zone ----------");
-                Logger.WriteLine(Enemy_Spell);
-                Logger.WriteLine(Enemy_MainMonster);
-                Logger.WriteLine(" | " + enemy_m_6 + " | " + enemy_m_5 + " | " + "            Field :" + "| " + enemy_s_5 + " |");
-                Logger.WriteLine(" | " + bot_m_5 + " | " + bot_m_6 + " | " + "            Field :" + "| " + bot_s_5 + " |");
-                Logger.WriteLine(Bot_MainMonster);
-                Logger.WriteLine(Bot_Spell);
-                Logger.WriteLine("---------- Zone ----------");
-            }*/
+            _duel.Phase = (DuelPhase)packet.ReadInt16();            
+           
             if (_showbothand &&_duel.Phase==DuelPhase.Standby)
             {              
                 Logger.DebugWriteLine("*********Bot Hand*********");
@@ -728,66 +661,7 @@ namespace WindBot.Game
                 {                    
                     Logger.DebugWriteLine("(" + previousControler.ToString() + " 's " + (card.Name ?? "UnKnowCard")
                        + " from " +
-                       (CardLocation)previousLocation + " move to " + (CardLocation)currentLocation + ")");
-                    /*if((CardLocation)previousLocation==CardLocation.MonsterZone)
-                    {
-                        string Bot_Spell = " | ";
-                for(int i = 0; i < 5; i++)
-                {
-                    if (_duel.Fields[0].SpellZone[i] != null)                       
-                        Bot_Spell += _duel.Fields[0].SpellZone[i].Name.ToString();
-                    Bot_Spell += " | ";
-                }
-                string Bot_MainMonster = " | ";
-                for (int i = 0; i < 5; i++)
-                {
-                    if (_duel.Fields[0].MonsterZone[i] != null)                       
-                        Bot_MainMonster += _duel.Fields[0].MonsterZone[i].Name.ToString();
-                    Bot_MainMonster += " | ";
-                }                
-                string bot_s_5 = null;
-                string bot_m_5 = null;
-                string bot_m_6 = null;
-                if (_duel.Fields[0].SpellZone[5] != null)
-                    bot_s_5 = _duel.Fields[0].SpellZone[5].Name;
-                if (_duel.Fields[0].MonsterZone[5] != null)
-                    bot_m_5 = _duel.Fields[0].MonsterZone[5].Name;
-                if (_duel.Fields[0].MonsterZone[6] != null)
-                    bot_m_6 = _duel.Fields[0].MonsterZone[6].Name;
-                //enemy
-                string Enemy_Spell = " | ";
-                for (int i = 4; i >= 0; i--)
-                {
-                    if (_duel.Fields[1].SpellZone[i] != null)                       
-                        Enemy_Spell += (_duel.Fields[1].SpellZone[i].Name ?? "UnKnowCard");
-                    Enemy_Spell += " | ";
-                }
-                string Enemy_MainMonster = " | ";
-                for (int i = 4; i >= 0; i--)
-                {
-                    if (_duel.Fields[1].MonsterZone[i] != null)                
-                        Enemy_MainMonster += (_duel.Fields[1].MonsterZone[i].Name ?? "UnKnowCard");
-                    Enemy_MainMonster += " | ";
-                }                
-                string enemy_m_5 = null;
-                string enemy_m_6 = null;
-                string enemy_s_5 = null;
-                if (_duel.Fields[1].MonsterZone[5] != null)
-                    enemy_m_5 = (_duel.Fields[1].MonsterZone[5].Name ?? "UnKnowCard");
-                if (_duel.Fields[1].MonsterZone[6] != null)
-                    enemy_m_6 = (_duel.Fields[1].MonsterZone[6].Name ?? "UnKnowCard");
-                if (_duel.Fields[1].SpellZone[5] != null)
-                    enemy_s_5 = (_duel.Fields[1].SpellZone[5].Name ?? "UnKnowCard");
-
-                Logger.WriteLine("---------- Zone ----------");
-                Logger.WriteLine(Enemy_Spell);
-                Logger.WriteLine(Enemy_MainMonster);
-                Logger.WriteLine(" | " + enemy_m_6 + " | " + enemy_m_5 + " | " + "            Field :" + "| " + enemy_s_5 + " |");
-                Logger.WriteLine(" | " + bot_m_5 + " | " + bot_m_6 + " | " + "            Field :" + "| " + bot_s_5 + " |");
-                Logger.WriteLine(Bot_MainMonster);
-                Logger.WriteLine(Bot_Spell);
-                Logger.WriteLine("---------- Zone ----------");
-                    }*/
+                       (CardLocation)previousLocation + " move to " + (CardLocation)currentLocation + ")");              
                 }
             }
             
