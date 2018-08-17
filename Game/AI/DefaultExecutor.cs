@@ -85,6 +85,8 @@ namespace WindBot.Game.AI
             public const int ImperialOrder = 61740673;
             public const int NaturiaBeast = 33198837;
             public const int AntiSpellFragrance = 58921041;
+
+            public const int BorrelswordDragon = 85289965;
         }
         IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
@@ -363,6 +365,9 @@ namespace WindBot.Game.AI
 
             if (!defender.IsMonsterHasPreventActivationEffectInBattle())
             {
+
+                if (attacker.Id == _CardId.BorrelswordDragon)
+                    attacker.RealPower = 9999;
                 if (attacker.Id == _CardId.EaterOfMillions && !attacker.IsDisabled())
                 {
                     if (defender.HasType(CardType.Token)) return false;
