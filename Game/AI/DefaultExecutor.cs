@@ -366,8 +366,8 @@ namespace WindBot.Game.AI
             if (!defender.IsMonsterHasPreventActivationEffectInBattle())
             {
 
-                if (attacker.Id == _CardId.BorrelswordDragon)
-                    attacker.RealPower = 9999;
+                if (attacker.Id == _CardId.BorrelswordDragon && !attacker.IsDisabled())
+                    attacker.RealPower += defender.RealPower / 2;
                 if (attacker.Id == _CardId.EaterOfMillions && !attacker.IsDisabled())
                 {
                     if (defender.HasType(CardType.Token)) return false;
