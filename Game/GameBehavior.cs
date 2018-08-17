@@ -293,6 +293,10 @@ namespace WindBot.Game
             string message = packet.ReadUnicode(256);
             string myName = (player != 0) ? _room.Names[1] : _room.Names[0];
             string otherName = (player == 0) ? _room.Names[1] : _room.Names[0];
+
+            Logger.DebugWriteLine(message);//dialog welcome 寫 "roomname"
+            return;
+
             if (player < 4)
                 Logger.DebugWriteLine(otherName + " say to " + myName + ": " + message);
         }
@@ -937,7 +941,7 @@ namespace WindBot.Game
             }
             _ai.OnChainEnd();
             _duel.LastChainPlayer = -1;
-           Logger.DebugWriteLine("OnChainEnd= " + _duel.CurrentChain[0].Name);
+          // Logger.DebugWriteLine("OnChainEnd= " + _duel.CurrentChain[0].Name);
             _duel.CurrentChain.Clear();
             //_duel.ChainTargets.Clear();
         }
