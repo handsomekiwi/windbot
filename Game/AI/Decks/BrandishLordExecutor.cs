@@ -756,7 +756,7 @@ namespace WindBot.Game.AI.Decks
                 {
                     foreach(ClientCard check in Enemy.GetMonsters())
                     {
-                        if(check.IsAttack())
+                        if(check.IsAttack() && !check.HasType(CardType.Link))
                         {
                             AI.SelectCard(check);
                             return true;
