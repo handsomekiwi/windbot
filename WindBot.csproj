@@ -73,6 +73,7 @@
     <Compile Include="Game\AI\Decks\BlueEyesMaxDragonExecutor.cs" />
     <Compile Include="Game\AI\Decks\BujinExecutor.cs" />
     <Compile Include="Game\AI\Decks\CyberDragonExecutor.cs" />
+    <Compile Include="Game\AI\Decks\DemiseTrueDracoExecutor.cs" />
     <Compile Include="Game\AI\Decks\InfernoidExecutor.cs" />
     <Compile Include="Game\AI\Decks\SkyStrikerExecutor.cs" />
     <Compile Include="Game\AI\Decks\KozmoExecutor.cs" />
