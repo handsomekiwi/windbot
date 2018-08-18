@@ -53,6 +53,7 @@ namespace WindBot.Game.AI.Decks
             public const int ElShaddollWinda = 94977269;
             public const int BrandishSkillJammingWave = 25955749;
             public const int BrandishSkillAfterburner = 99550630;
+            public const int EternalSoul = 48680970;
         }
 
         public PhantasmExecutor(GameAI ai, Duel duel)
@@ -145,6 +146,11 @@ namespace WindBot.Game.AI.Decks
                 AI.SelectCard(AI.Utils.GetBestEnemyCard(false,true));
                 return true;
             }
+            if(Enemy.HasInSpellZone(CardId.EternalSoul))
+            {
+                AI.SelectCard(CardId.EternalSoul);
+                return UniqueFaceupSpell();
+            }
             if(Bot.GetMonsterCount()>0 && !Bot.HasInSpellZone(CardId.SeaStealthAttack) &&
                 AI.Utils.IsOneEnemyBetterThanValue(2000,true) && Duel.Phase==DuelPhase.BattleStart)
             {
@@ -180,6 +186,8 @@ namespace WindBot.Game.AI.Decks
             {
                 if (m.IsAttack()) count++;                    
             }
+            if (AI.Utils.GetTotalAttackingMonsterAttack(1) >= Bot.LifePoints)
+                return true;
             return count >= 2;
         }
 
