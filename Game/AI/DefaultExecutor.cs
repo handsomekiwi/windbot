@@ -399,6 +399,7 @@ namespace WindBot.Game.AI
 
             if (defender.IsMonsterInvincible() && defender.IsDefense())
                 return false;
+            if (defender.IsMonsterDangerous()) return false;
             if (Enemy.HasInMonstersZone(_CardId.DupeFrog, true) && defender.Id != _CardId.DupeFrog)
                 return false;
 
