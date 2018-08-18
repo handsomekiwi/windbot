@@ -15,7 +15,7 @@ namespace WindBot.Game.AI.Decks
             public const int AshBlossom = 14558127;
             public const int EaterOfMillions = 63845230;
 
-            public const int HarpieFeatherDuster = 18144507;
+            public const int HarpieFeatherDuster = 18144506;
             public const int PotOfDesires = 35261759;
             public const int FossilDig = 47325505;
             public const int CardOfDemise = 59750328;
@@ -146,7 +146,7 @@ namespace WindBot.Game.AI.Decks
                 return true;
             }
             if(Bot.GetMonsterCount()>0 && !Bot.HasInSpellZone(CardId.SeaStealthAttack) &&
-                AI.Utils.IsOneEnemyBetterThanValue(2000,true))
+                AI.Utils.IsOneEnemyBetterThanValue(2000,true) && Duel.Phase==DuelPhase.BattleStart)
             {
                 AI.SelectCard(AI.Utils.GetBestEnemyMonster(true,true));
                 return UniqueFaceupSpell();
@@ -168,7 +168,7 @@ namespace WindBot.Game.AI.Decks
             if(Enemy.HasInMonstersZone(CardId.ElShaddollWinda))
             {
                 AI.SelectCard(CardId.ElShaddollWinda);
-                return true;
+                return UniqueFaceupSpell();
             }
             return DefaultInfiniteImpermanence() && UniqueFaceupSpell();
         }
@@ -215,6 +215,7 @@ namespace WindBot.Game.AI.Decks
 
         private bool Metaverseeff()
         {
+            if (Duel.LastChainPlayer == 0) return false;
             if (!Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
             {
                 AI.SelectOption(1);
@@ -516,6 +517,7 @@ namespace WindBot.Game.AI.Decks
                         target = s;
                 }
                 if (target != null && AI.Utils.IsChainTarget(target)) return true;
+                Logger.DebugWriteLine("DefaultOnBecomeTarget()" + DefaultOnBecomeTarget());
                 if (DefaultOnBecomeTarget()) return true;
                 target = AI.Utils.GetLastChainCard();
                 if(target!=null)
