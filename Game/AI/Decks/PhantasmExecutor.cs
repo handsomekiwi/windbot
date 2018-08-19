@@ -141,7 +141,7 @@ namespace WindBot.Game.AI.Decks
 
         private bool PhantasmSprialBattleeff()
         {
-            if (DefaultOnBecomeTarget())
+            if (DefaultOnBecomeTarget() && Card.Location==CardLocation.SpellZone)
             {
                 AI.SelectCard(AI.Utils.GetBestEnemyCard(false,true));
                 return true;
@@ -170,7 +170,7 @@ namespace WindBot.Game.AI.Decks
 
         private bool PhantasmSpiralPowereff()
         {
-            if (DefaultOnBecomeTarget()) return true;
+            if (DefaultOnBecomeTarget() && Card.Location == CardLocation.SpellZone) return true;
             if(Enemy.HasInMonstersZone(CardId.ElShaddollWinda))
             {
                 AI.SelectCard(CardId.ElShaddollWinda);
@@ -482,7 +482,12 @@ namespace WindBot.Game.AI.Decks
         }
         private bool SeaStealthAttackeff()
         {
-            if ((Card.IsFacedown() && Bot.HasInHandOrInSpellZoneOrInGraveyard(CardId.PacifisThePhantasmCity)) || DefaultOnBecomeTarget())
+            if(DefaultOnBecomeTarget())
+            {
+                AI.SelectCard(CardId.MegalosmasherX);
+                return true;
+            }
+            if ((Card.IsFacedown() && Bot.HasInHandOrInSpellZoneOrInGraveyard(CardId.PacifisThePhantasmCity)))
             {
                 if (!Bot.HasInSpellZone(CardId.PacifisThePhantasmCity))
                 {
@@ -524,9 +529,7 @@ namespace WindBot.Game.AI.Decks
                     if (s.Id == CardId.PacifisThePhantasmCity)
                         target = s;
                 }
-                if (target != null && AI.Utils.IsChainTarget(target)) return true;
-                Logger.DebugWriteLine("DefaultOnBecomeTarget()" + DefaultOnBecomeTarget());
-                if (DefaultOnBecomeTarget()) return true;
+                if (target != null && AI.Utils.IsChainTarget(target)) return true;                
                 target = AI.Utils.GetLastChainCard();
                 if(target!=null)
                 {
