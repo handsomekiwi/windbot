@@ -347,7 +347,9 @@ namespace WindBot.Game.AI.Decks
             {
                 if(Enemy.BattlingMonster.Attack-Bot.LifePoints>=1000)
                     return DefaultUniqueTrap();
-            }            
+            }
+            if (AI.Utils.GetTotalAttackingMonsterAttack(1) >= Bot.LifePoints)
+                return DefaultUniqueTrap();
             if (Enemy.GetMonsterCount() >= 2)
                 return DefaultUniqueTrap();
             return false;

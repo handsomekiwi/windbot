@@ -771,7 +771,8 @@ namespace WindBot.Game
             if (ChainReplaceOld.Name == null && _duel.CurrentChain.Count > 0)
                 ChainReplace = true;
             _ai.OnChaining(card, cc);
-            _duel.ChainTargets.Clear();            
+            //_duel.ChainTargets.Clear();  
+            _duel.ChainTargetOnly.Clear();
             _duel.CurrentChain.Add(card);
             _duel.Onattack = false;
             
@@ -817,7 +818,7 @@ namespace WindBot.Game
             _duel.LastChainPlayer = -1;
           // Logger.DebugWriteLine("OnChainEnd= " + _duel.CurrentChain[0].Name);
             _duel.CurrentChain.Clear();
-            _duel.ChainTargets.Clear();
+            _duel.ChainTargets.Clear();            
         }
 
         private void OnCardSorting(BinaryReader packet)
@@ -1052,6 +1053,7 @@ namespace WindBot.Game
                 if (_debug)
                     Logger.DebugWriteLine("(" + (CardLocation)loc + " 's " + (card.Name ?? "UnKnowCard") + " become target)");
                 _duel.ChainTargets.Add(card);
+                _duel.ChainTargetOnly.Add(card);
             }           
         }
 
