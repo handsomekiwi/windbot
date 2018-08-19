@@ -54,6 +54,7 @@ namespace WindBot.Game.AI.Decks
             public const int BrandishSkillJammingWave = 25955749;
             public const int BrandishSkillAfterburner = 99550630;
             public const int EternalSoul = 48680970;
+            public const int SuperboltThunderDragon = 15291624;
         }
 
         public PhantasmExecutor(GameAI ai, Duel duel)
@@ -115,10 +116,12 @@ namespace WindBot.Game.AI.Decks
         }
         bool summon_used = false;
         bool CardOfDemiseeff_used = false;
+        bool SeaStealthAttackeff_used = false;
         public override void OnNewTurn()
-        {
+        {            
             summon_used = false;
             CardOfDemiseeff_used = false;
+            SeaStealthAttackeff_used = false;
             base.OnNewTurn();
         }
         private bool PreventFeatherDustereff()
@@ -171,11 +174,19 @@ namespace WindBot.Game.AI.Decks
         private bool PhantasmSpiralPowereff()
         {
             if (DefaultOnBecomeTarget() && Card.Location == CardLocation.SpellZone) return true;
-            if(Enemy.HasInMonstersZone(CardId.ElShaddollWinda))
+            if(Duel.Player == 0 || (Duel.Player==1 && Bot.BattlingMonster!=null))
             {
-                AI.SelectCard(CardId.ElShaddollWinda);
-                return UniqueFaceupSpell();
-            }
+                if(Enemy.HasInMonstersZone(CardId.ElShaddollWinda))
+                {
+                    AI.SelectCard(CardId.ElShaddollWinda);
+                    return UniqueFaceupSpell();
+                }
+                if(Enemy.HasInMonstersZone(CardId.SuperboltThunderDragon))
+                {
+                    AI.SelectCard(CardId.SuperboltThunderDragon);
+                    return UniqueFaceupSpell();
+                }
+            }            
             return DefaultInfiniteImpermanence() && UniqueFaceupSpell();
         }
 
@@ -327,6 +338,27 @@ namespace WindBot.Game.AI.Decks
             }
             else
             {
+                ClientCard target = null;
+                foreach(ClientCard s in Bot.GetSpells())
+                {
+                    if(s.Id==CardId.SeaStealthAttack && Card.IsFaceup())
+                    {
+                        target = s;
+                        break;
+                    }
+                }
+                foreach(ClientCard m in Bot.GetMonsters())
+                {
+                    if(m.HasAttribute(CardAttribute.Water))
+                    {
+                        if (target != null && !SeaStealthAttackeff_used)
+                        {
+                            if (AI.Utils.IsChainTarget(Card) || AI.Utils.IsChainTarget(target))
+                                return false;
+                        }
+                        break;
+                    }
+                }                
                 AI.SelectPlace(Zones.z1 | Zones.z3);
                 AI.SelectCard(CardId.PhantasmSprialBattle);
                 return true;
@@ -481,10 +513,11 @@ namespace WindBot.Game.AI.Decks
             return true;
         }
         private bool SeaStealthAttackeff()
-        {
-            if(DefaultOnBecomeTarget())
+        {            
+            if (DefaultOnBecomeTarget())
             {
                 AI.SelectCard(CardId.MegalosmasherX);
+                SeaStealthAttackeff_used = true;
                 return true;
             }
             if ((Card.IsFacedown() && Bot.HasInHandOrInSpellZoneOrInGraveyard(CardId.PacifisThePhantasmCity)))
@@ -529,18 +562,24 @@ namespace WindBot.Game.AI.Decks
                     if (s.Id == CardId.PacifisThePhantasmCity)
                         target = s;
                 }
-                if (target != null && AI.Utils.IsChainTarget(target)) return true;                
+                if (target != null && AI.Utils.IsChainTarget(target))
+                {
+                    SeaStealthAttackeff_used = true;
+                    return true;
+                }                
                 target = AI.Utils.GetLastChainCard();
                 if(target!=null)
                 {
                     if(target.Id==CardId.BrandishSkillAfterburner)
                     {
                         AI.SelectCard(CardId.MegalosmasherX);
+                        SeaStealthAttackeff_used = true;
                         return true;
                     }
                     if(Enemy.GetGraveyardSpells().Count>=3 && target.Id==CardId.BrandishSkillJammingWave)
                     {
                         AI.SelectCard(CardId.MegalosmasherX);
+                        SeaStealthAttackeff_used = true;
                         return true;
                     }
                 }
