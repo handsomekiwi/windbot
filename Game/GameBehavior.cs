@@ -771,7 +771,7 @@ namespace WindBot.Game
             if (ChainReplaceOld.Name == null && _duel.CurrentChain.Count > 0)
                 ChainReplace = true;
             _ai.OnChaining(card, cc);
-            _duel.ChainTargets.Clear();            
+            //_duel.ChainTargets.Clear();            
             _duel.CurrentChain.Add(card);
             _duel.Onattack = false;
             
