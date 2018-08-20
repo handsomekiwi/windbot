@@ -215,14 +215,14 @@ namespace WindBot.Game.AI.Decks
                 {
                     foreach (ClientCard m in Bot.Hand)
                     {
-                        if (m.Id == CardId.AdvancedRitualArt) ;
-                        AI.SelectCard(m);
+                        if (m.Id == CardId.AdvancedRitualArt) 
+                            AI.SelectCard(m);
                     }
                 }
                 foreach(ClientCard m in Bot.Hand)
                 {
-                    if (m.Id != CardId.AdvancedRitualArt);
-                    AI.SelectCard(m);
+                    if (m.Id != CardId.AdvancedRitualArt)
+                        AI.SelectCard(m);
                 }
                 AI.SelectNextCard(new[] { CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesAlternativeWhiteDragon });
                 return true;
