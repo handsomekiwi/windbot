@@ -1436,7 +1436,7 @@ namespace WindBot.Game.AI.Decks
         private bool Sharkcannoneff()
         {
             if(Duel.ChainTargetOnly[0]!=null && Duel.LastChainPlayer==1 && 
-                Duel..ChainTargetOnly[0].Location==CardLocation.Grave)
+                Duel.ChainTargetOnly[0].Location==CardLocation.Grave)
             {
                 AI.SelectCard(Duel.ChainTargetOnly[0]);
                 AI.SelectYesNo(false);

@@ -222,6 +222,13 @@ namespace WindBot.Game.AI.Decks
                 if (m.HasAttribute(CardAttribute.Water)) Water_count++;
                 if (m.HasAttribute(CardAttribute.Wind)) Wind_count++;
             }
+            if (dark_count > 1) dark_count = 1;
+            if (Divine_count > 1) Divine_count = 1;
+            if (Earth_count > 1) Earth_count = 1;
+            if (Fire_count > 1) Fire_count = 1;
+            if (Light_count > 1) Light_count = 1;
+            if (Water_count > 1) Water_count = 1;
+            if (Wind_count > 1) Wind_count = 1;
             return ((dark_count + Divine_count + Earth_count + Fire_count + Light_count + Water_count + Wind_count) >= 2 && UniqueFaceupSpell());
         }
 

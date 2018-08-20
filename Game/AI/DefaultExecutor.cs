@@ -87,6 +87,7 @@ namespace WindBot.Game.AI
             public const int AntiSpellFragrance = 58921041;
 
             public const int BorrelswordDragon = 85289965;
+            public const int PalladiumOracleMahad = 71703785;
         }
         IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
@@ -337,7 +338,7 @@ namespace WindBot.Game.AI
             if (Bot.HasInSpellZone(_CardId.MoonMirrorShield, true) && attacker.IsEquiped(_CardId.MoonMirrorShield))
                 attacker.RealPower = (defender.Attack > defender.Defense ? defender.Attack : defender.Defense) + 100;
             if (!attacker.IsMonsterHasPreventActivationEffectInBattle())
-            {                 
+            {                
                 if(defender.Race==(int)CardRace.SpellCaster && defender.Attribute== (int)CardAttribute.Dark &&
                     Enemy.HasInMonstersZone(_CardId.ApprenticeLllusionMagician,true) && defender.IsAttack() &&
                     defender.Id!=_CardId.ApprenticeLllusionMagician)
@@ -365,7 +366,6 @@ namespace WindBot.Game.AI
 
             if (!defender.IsMonsterHasPreventActivationEffectInBattle())
             {
-
                 if (attacker.Id == _CardId.BorrelswordDragon && !attacker.IsDisabled())
                     attacker.RealPower += defender.RealPower / 2;
                 if (attacker.Id == _CardId.EaterOfMillions && !attacker.IsDisabled())
@@ -405,7 +405,10 @@ namespace WindBot.Game.AI
 
             if (Enemy.HasInMonstersZone(_CardId.MaraudingCaptain, true) && defender.Id != _CardId.MaraudingCaptain && defender.Race == (int)CardRace.Warrior)
                 return false;
-            
+
+            if (defender.Id == _CardId.PalladiumOracleMahad && attacker.HasAttribute(CardAttribute.Dark) && !defender.IsDisabled())
+                defender.RealPower *= 2;
+
             if (defender.Id == _CardId.UltimayaTzolkin && !defender.IsDisabled())
             {
                 List<ClientCard> monsters = Enemy.GetMonsters();
@@ -415,7 +418,7 @@ namespace WindBot.Game.AI
                         return false;
                 }
             }
-            if (Enemy.HasInMonstersZone(_CardId.MekkKnightMorningStar))
+            if (Enemy.HasInMonstersZone(_CardId.MekkKnightMorningStar,true))
             {
                 int attackerzone = -1;
                 int defenderzone = -1;
