@@ -455,13 +455,25 @@ namespace WindBot.Game.AI.Decks
             if (AI.Utils.GetProblematicEnemyMonster() == null && Bot.ExtraDeck.Count < 5) return false;
             if (Bot.GetMonstersInMainZone().Count >= 5) return false;
             if (AI.Utils.IsTurn1OrMain2()) return false;
-            AI.SelectPosition(CardPosition.FaceUpAttack);            
-            AI.SelectCard(new[] {
-            CardId.TopologicBomberDragon,
-            CardId.TopologicTrisbaena,
-            CardId.KnightmareGryphon,
-            CardId.SummonSorceress,
-            CardId.BorreloadDragon});
+            AI.SelectPosition(CardPosition.FaceUpAttack);
+            IList<ClientCard> material_list = new List<ClientCard>();
+            if(Bot.HasInExtra(CardId.BorreloadDragon))
+            {
+                AI.SelectCard(new[] {
+                CardId.TopologicBomberDragon,
+                CardId.TopologicTrisbaena,
+                CardId.KnightmareGryphon,
+                CardId.SummonSorceress,
+                CardId.BorreloadDragon});
+            }
+            else 
+            {               
+                foreach(ClientCard m in Bot.ExtraDeck)
+                {
+                    if (material_list.Count == 5) break;
+                    material_list.Add(m);
+                }
+            }
             return true;
         }
 
