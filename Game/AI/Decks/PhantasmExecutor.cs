@@ -204,6 +204,7 @@ namespace WindBot.Game.AI.Decks
 
         private bool GozenMatcheff()
         {
+            if (Bot.GetMonsterCount() >= 4 || Bot.HasInSpellZone(CardId.Scapegoat)) return false;
             if (DefaultOnBecomeTarget()) return true;
             int dark_count = 0;
             int Divine_count = 0;
