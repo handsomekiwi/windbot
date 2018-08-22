@@ -62,8 +62,8 @@ namespace WindBot.Game.AI.Decks
 
         public GrenMajuThunderBoarderExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
-        {            
-            AddExecutor(ExecutorType.ToBattlePhase);
+        {
+            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
             AddExecutor(ExecutorType.Activate, CardId.EvenlyMatched, EvenlyMatchedeff);
             //Sticker
             AddExecutor(ExecutorType.Activate, CardId.MacroCosmos, MacroCosmoseff);
@@ -112,17 +112,10 @@ namespace WindBot.Game.AI.Decks
             //set
             AddExecutor(ExecutorType.SpellSet, SpellSet);
         }
-        bool CardOfDemiseeff_used = false;
-        bool plan_A = false;
+        bool CardOfDemiseeff_used = false;        
         bool eater_eff = false;
         public override void OnNewTurn()
-        {
-            if (Bot.HasInHand(CardId.EvenlyMatched) && Duel.Turn == 2 && Enemy.GetFieldCount() >= 2)
-            {
-                Logger.DebugWriteLine("***********plan_A");
-                plan_A = true;
-                AI.ManualPhaseChange = true;
-            }
+        {            
             eater_eff = false;
             CardOfDemiseeff_used = false;
         }
@@ -152,6 +145,10 @@ namespace WindBot.Game.AI.Decks
             base.OnNewPhase();
         }
 
+        private bool GoToBattlePhase()
+        {
+            return Bot.HasInHand(CardId.EvenlyMatched) && Duel.Turn >= 2 && Enemy.GetFieldCount() >= 2 && Bot.GetFieldCount() == 0;
+        }
         private bool SpellWillBeNegated()
         {
             ClientCard card = null;
@@ -197,13 +194,11 @@ namespace WindBot.Game.AI.Decks
         }       
 
         private bool EvenlyMatchedeff()
-        {            
-            plan_A = false;
-            return true;
+        {
+            return Enemy.GetFieldCount()-Bot.GetFieldCount() > 1;
         }
         private bool InfiniteImpermanenceeff()
-        {
-            if (plan_A) return false;
+        {           
             AI.SelectPlace(Zones.z2, 4);
             ClientCard target = Enemy.MonsterZone.GetShouldBeDisabledBeforeItUseEffectMonster();
             if(target!=null)
@@ -479,8 +474,7 @@ namespace WindBot.Game.AI.Decks
             return false;
         }
         private bool InspectBoardersummon()
-        {
-            if (plan_A) return false;
+        {           
             if (Bot.MonsterZone[0] == null)
                 AI.SelectPlace(Zones.z0, 1);
             else
@@ -489,8 +483,7 @@ namespace WindBot.Game.AI.Decks
         }
         private bool GrenMajuDaEizosummon()
         {
-            if (Duel.Turn == 1) return false;
-            if (plan_A) return false;
+            if (Duel.Turn == 1) return false;           
             if (Bot.MonsterZone[0] == null)
                 AI.SelectPlace(Zones.z0, 1);
             else
@@ -499,9 +492,7 @@ namespace WindBot.Game.AI.Decks
         }
 
         private bool ThunderKingRaiOhsummon()
-        {
-            if (plan_A) return false;
-
+        { 
             if (Bot.MonsterZone[0] == null)
                 AI.SelectPlace(Zones.z0, 1);
             else
@@ -583,8 +574,7 @@ namespace WindBot.Game.AI.Decks
             else
                 AI.SelectPlace(Zones.z4);
             if (Enemy.HasInMonstersZone(CardId.KnightmareGryphon, true)) return false;
-            if (Bot.HasInMonstersZone(CardId.InspectBoarder) && !eater_eff) return false;
-            if (plan_A) return false;
+            if (Bot.HasInMonstersZone(CardId.InspectBoarder) && !eater_eff) return false;           
             if (AI.Utils.GetProblematicEnemyMonster() == null && Bot.ExtraDeck.Count < 5) return false;
             if (Bot.GetMonstersInMainZone().Count >= 5) return false;
             if (AI.Utils.IsTurn1OrMain2()) return false;
@@ -694,8 +684,7 @@ namespace WindBot.Game.AI.Decks
         }
 
         private bool SpellSet()
-        {           
-            if (plan_A) return false;
+        {
             int count = 0;
             foreach(ClientCard check in Bot.Hand)
             {

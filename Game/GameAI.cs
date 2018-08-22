@@ -178,6 +178,14 @@ namespace WindBot.Game
             Executor.SetBattle(battle);           
             foreach (CardExecutor exec in Executor.Executors)
             {
+                if (exec.Type == ExecutorType.GoToMainPhase2 && battle.CanMainPhaseTwo && exec.Func()) // check if should enter main phase 2 directly
+                {
+                    return ToMainPhase2();
+                }
+                if (exec.Type == ExecutorType.GoToEndPhase && battle.CanEndPhase && exec.Func()) // check if should enter end phase directly
+                {
+                    return ToEndPhase();
+                }
                 for (int i = 0; i < battle.ActivableCards.Count; ++i)
                 {
                     ClientCard card = battle.ActivableCards[i];
@@ -422,18 +430,18 @@ namespace WindBot.Game
             Executor.SetMain(main);
             foreach (CardExecutor exec in Executor.Executors)
             {
-                if(exec.Type==ExecutorType.ToBattlePhase && ManualPhaseChange)
+                if (exec.Type == ExecutorType.GoToEndPhase && main.CanEndPhase && exec.Func()) // check if should enter end phase directly
                 {
-                    ManualPhaseChange = false;
-                    if(Duel.Phase < DuelPhase.BattleStart && Duel.Player == 0)
-                        return new MainPhaseAction(MainPhaseAction.MainAction.ToBattlePhase);
-                }                    
-                if (exec.Type == ExecutorType.ToEndPhase && ManualPhaseChange)
-                {
-                    ManualPhaseChange = false;
-                    if(Duel.Phase < DuelPhase.End && Duel.Player == 0)
-                        return new MainPhaseAction(MainPhaseAction.MainAction.ToEndPhase);
+                    _dialogs.SendEndTurn();
+                    return new MainPhaseAction(MainPhaseAction.MainAction.ToEndPhase);
                 }
+                if (exec.Type == ExecutorType.GoToBattlePhase && main.CanBattlePhase && exec.Func()) // check if should enter battle phase directly
+                {
+                    return new MainPhaseAction(MainPhaseAction.MainAction.ToBattlePhase);
+                }
+                // NOTICE: GoToBattlePhase and GoToEndPhase has no "card" can be accessed to ShouldExecute(), so instead use exec.Func() to check ...
+                // enter end phase and enter battle pahse is in higher priority. 
+
                 for (int i = 0; i < main.ActivableCards.Count; ++i)
                 {
                     ClientCard card = main.ActivableCards[i];
@@ -791,8 +799,7 @@ namespace WindBot.Game
         private int m_announce;
         private int m_yesno;
         private IList<CardAttribute> m_attributes = new List<CardAttribute>();
-        private IList<CardRace> m_races = new List<CardRace>();
-        public bool ManualPhaseChange=false;
+        private IList<CardRace> m_races = new List<CardRace>();        
         public void SelectCard(ClientCard card)
         {
             m_selector_pointer = m_selector.Count();

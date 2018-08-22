@@ -9,7 +9,8 @@
         SpellSet,
         Activate,
         SummonOrSet,
-        ToBattlePhase,       
-        ToEndPhase
+        GoToBattlePhase,
+        GoToMainPhase2,
+        GoToEndPhase
     }
 }

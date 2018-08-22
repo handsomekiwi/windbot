@@ -61,7 +61,7 @@ namespace WindBot.Game.AI.Decks
             : base(ai, duel)
         {
             //counter
-            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);
+            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
             AddExecutor(ExecutorType.Activate, CardId.StarlightRoad, PreventFeatherDustereff);
             AddExecutor(ExecutorType.Activate, CardId.TheHugeRevolutionIsOver, PreventFeatherDustereff);
             AddExecutor(ExecutorType.Activate, _CardId.GhostBelle, DefaultGhostBelle);
@@ -129,13 +129,12 @@ namespace WindBot.Game.AI.Decks
             return Duel.LastChainPlayer == 1;          
         }
 
-        private bool ToBattlePhaseeff()
+        private bool GoToBattlePhase()
         {           
             if (Enemy.GetMonsterCount() == 0)
             {
                 if (AI.Utils.GetTotalAttackingMonsterAttack(0) >= Enemy.LifePoints)
-                {
-                    AI.ManualPhaseChange = true;
+                {                   
                     return true;
                 }
             }
