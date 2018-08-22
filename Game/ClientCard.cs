@@ -48,7 +48,7 @@ namespace WindBot.Game
         public IList<ClientCard> EquipTarget = new List<ClientCard>();
         //public List<ClientCard> EquipTarget { get; set; }
         public ClientCard(int id, CardLocation loc)
-            : this(id, loc, 0, 0)
+            : this(id, loc, -1, 0)
         {
         }
 
