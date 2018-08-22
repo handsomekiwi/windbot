@@ -835,7 +835,7 @@ namespace WindBot.Game.AI
         /// <summary>
         /// Default GhostBelle effect
         /// </summary>
-        protected bool DefaultGhostBelle()
+        protected bool DefaultGhostBelleAndHauntedMansion()
         {
             return DefaultTrap();
         }
