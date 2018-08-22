@@ -216,7 +216,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.SpSummon, CardId.BrandishMaidenShizuku, ShizukuSp_B2);
 
             //To battle phase
-            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);
+            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
             //card control           
             AddExecutor(ExecutorType.Activate, CardId.AreaZero, AreaZeroEffect);
             AddExecutor(ExecutorType.Activate, CardId.BrandishMaidenRei, BrandishMaidenReiEffect);
@@ -457,13 +457,12 @@ namespace WindBot.Game.AI.Decks
             }
         }
         
-        private bool ToBattlePhaseeff()
+        private bool GoToBattlePhase()
         {
             if(Enemy.GetMonsterCount()==0)
             {
                 if(AI.Utils.GetTotalAttackingMonsterAttack(0)>=Enemy.LifePoints)
-                {
-                    AI.ManualPhaseChange = true;
+                {                   
                     return true;
                 }
             }
