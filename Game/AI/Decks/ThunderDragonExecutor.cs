@@ -60,7 +60,7 @@ namespace WindBot.Game.AI.Decks
             : base(ai, duel)
         {
             //counter
-            AddExecutor(ExecutorType.Activate, CardId.GhostBelle, DefaultGhostBelle);
+            AddExecutor(ExecutorType.Activate, CardId.GhostBelle, DefaultGhostBelleAndHauntedMansion);
             AddExecutor(ExecutorType.Activate, CardId.CalledByTheGrave, DefaultCalledByTheGrave);
             AddExecutor(ExecutorType.Activate, CardId.EffectVeiler, DefaultEffectVeiler);
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence, DefaultInfiniteImpermanence);
