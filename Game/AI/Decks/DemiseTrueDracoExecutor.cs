@@ -52,8 +52,8 @@ namespace WindBot.Game.AI.Decks
             : base(ai, duel)
         {
             //counter
-            AddExecutor(ExecutorType.ToBattlePhase, ToBattlePhaseeff);           
-            AddExecutor(ExecutorType.Activate, _CardId.GhostBelle, DefaultGhostBelle);
+            AddExecutor(ExecutorType.GoToBattlePhase, ToBattlePhaseeff);           
+            AddExecutor(ExecutorType.Activate, _CardId.GhostBelle, DefaultGhostBelleAndHauntedMansion);
             AddExecutor(ExecutorType.Activate, _CardId.CalledByTheGrave, DefaultCalledByTheGrave);
             AddExecutor(ExecutorType.Activate, _CardId.EffectVeiler, DefaultEffectVeiler);
             AddExecutor(ExecutorType.Activate, _CardId.InfiniteImpermanence, DefaultInfiniteImpermanence);
@@ -107,8 +107,7 @@ namespace WindBot.Game.AI.Decks
             if (Enemy.GetMonsterCount() == 0)
             {
                 if (AI.Utils.GetTotalAttackingMonsterAttack(0) >= Enemy.LifePoints)
-                {
-                    AI.ManualPhaseChange = true;
+                {                   
                     return true;
                 }
             }
