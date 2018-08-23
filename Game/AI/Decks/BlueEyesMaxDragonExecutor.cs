@@ -78,7 +78,7 @@ namespace WindBot.Game.AI.Decks
             //
             AddExecutor(ExecutorType.Activate, CardId.RecklessGreed, RecklessGreedeff);
             
-            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, Scapegoateff);
+            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
         }
         int Talismandra_count = 0;
         int Candoll_count = 0;
@@ -565,24 +565,7 @@ namespace WindBot.Game.AI.Decks
             }
             return false;
         }
-
-        private bool Scapegoateff()
-        {            
-            if (Duel.Player == 0) return false;
-            if (Duel.Phase == DuelPhase.End) return true;
-            if (Duel.LastChainPlayer == 1 && DefaultOnBecomeTarget()) return true;
-            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
-            {
-                int total_atk = 0;
-                List<ClientCard> enemy_monster = Enemy.GetMonsters();
-                foreach (ClientCard m in enemy_monster)
-                {
-                    if (m.IsAttack() && !m.Attacked) total_atk += m.Attack;
-                }
-                if (total_atk >= Bot.LifePoints) return true;
-            }
-            return false;
-        }
+       
         public override ClientCard OnSelectAttacker(IList<ClientCard> attackers, IList<ClientCard> defenders)
         {           
             for (int i = 0; i < attackers.Count; ++i)

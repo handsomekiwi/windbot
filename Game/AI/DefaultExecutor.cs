@@ -805,6 +805,29 @@ namespace WindBot.Game.AI
             AI.SelectCard(selected);
             return true;
         }
+
+        /// <summary>
+        /// Default Scapegoat effect
+        /// </summary>
+        private bool DefaultScapegoat()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if (Duel.Player == 0) return false;
+            if (Duel.Phase == DuelPhase.End) return true;
+            if (DefaultOnBecomeTarget()) return true;
+            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
+            {
+                if (Enemy.HasInMonstersZone(_CardId.UltimateConductorTytanno, true)) return false;
+                int total_atk = 0;
+                List<ClientCard> enemy_monster = Enemy.GetMonsters();
+                foreach (ClientCard m in enemy_monster)
+                {
+                    if (m.IsAttack()) total_atk += m.Attack;
+                }
+                if (total_atk >= Bot.LifePoints) return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Default MaxxC effect
         /// </summary>

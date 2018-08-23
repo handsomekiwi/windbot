@@ -106,7 +106,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.SpSummon, CardId.EaterOfMillions, EaterOfMillionssp);
             //spell          
             AddExecutor(ExecutorType.Activate, CardId.MoonMirrorShield, MoonMirrorShieldeff);
-            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, Scapegoateff);
+            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
             AddExecutor(ExecutorType.Activate, CardId.PhatomKnightsSword, PhatomKnightsSwordeff);
             AddExecutor(ExecutorType.Repos, MonsterRepos);
             //set
@@ -438,25 +438,6 @@ namespace WindBot.Game.AI.Decks
                 return true;
             }
             return false;
-        }
-
-        private bool Scapegoateff()
-        {
-            if (SpellWillBeNegated()) return false;
-            if (Duel.Player == 0) return false;            
-            if (Duel.Phase == DuelPhase.End) return true;
-            if (Duel.LastChainPlayer == 1 && (AI.Utils.IsChainTarget(Card) || (DefaultOnBecomeTarget() && !Bot.HasInSpellZone(CardId.WakingTheDragon)))) return true;
-            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
-            {
-                int total_atk = 0;
-                List<ClientCard> enemy_monster = Enemy.GetMonsters();
-                foreach (ClientCard m in enemy_monster)
-                {
-                    if (m.IsAttack()) total_atk += m.Attack;
-                }
-                if (total_atk >= Bot.LifePoints) return true;
-            }
-            return false;        
         }
 
         private bool PhatomKnightsSwordeff()
