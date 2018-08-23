@@ -69,9 +69,9 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.MacroCosmos, MacroCosmoseff);
             AddExecutor(ExecutorType.Activate, CardId.AntiSpellFragrance, AntiSpellFragranceeff);
             //counter
-            AddExecutor(ExecutorType.Activate, CardId.AshBlossomAndJoyousSpring, AshBlossomAndJoyousSpringeff);
+            AddExecutor(ExecutorType.Activate, CardId.AshBlossomAndJoyousSpring, DefaultAshBlossomAndJoyousSpring);
             AddExecutor(ExecutorType.Activate, CardId.MaxxC, DefaultMaxxC);            
-            AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence, InfiniteImpermanenceeff);
+            AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence, DefaultInfiniteImpermanence);
             AddExecutor(ExecutorType.Activate, CardId.SolemnWarning, DefaultSolemnWarning);
             AddExecutor(ExecutorType.Activate, CardId.SolemStrike, DefaultSolemnStrike);
             AddExecutor(ExecutorType.Activate, CardId.ImperialOrder, ImperialOrderfirst);
@@ -149,22 +149,7 @@ namespace WindBot.Game.AI.Decks
         {
             return Bot.HasInHand(CardId.EvenlyMatched) && Duel.Turn >= 2 && Enemy.GetFieldCount() >= 2 && Bot.GetFieldCount() == 0;
         }
-        private bool SpellWillBeNegated()
-        {
-            ClientCard card = null;
-            foreach (ClientCard check in Bot.GetSpells())
-            {
-                if(check.Id==CardId.ImperialOrder && !check.IsDisabled())
-                    card = check;
-            }
-                
-            if (card!=null && card.IsFaceup())
-                return true;
-            if (Enemy.HasInSpellZone(CardId.ImperialOrder, true))
-                return true;
-            return false;
-        }  
-        
+ 
         private bool MacroCosmoseff()
         {
            
@@ -183,56 +168,12 @@ namespace WindBot.Game.AI.Decks
             if (spell_count >= 2) return false;
             return Duel.Player == 1 && UniqueFaceupSpell();
         }
-
-        private bool AshBlossomAndJoyousSpringeff()
-        {
-            if (AI.Utils.GetLastChainCard().Id == CardId.MacroCosmos)
-                return false;
-            if (AI.Utils.GetLastChainCard().Id == CardId.UpstartGoblin)
-                return false;
-            return Duel.LastChainPlayer == 1;
-        }       
-
+ 
         private bool EvenlyMatchedeff()
         {
             return Enemy.GetFieldCount()-Bot.GetFieldCount() > 1;
         }
-        private bool InfiniteImpermanenceeff()
-        {           
-            AI.SelectPlace(Zones.z2, 4);
-            ClientCard target = Enemy.MonsterZone.GetShouldBeDisabledBeforeItUseEffectMonster();
-            if(target!=null)
-            {
-                AI.SelectCard(target);
-                return true;
-            }
-            if(Duel.LastChainPlayer==1)
-            {
-                foreach (ClientCard check in Enemy.GetMonsters())
-                {
-                    if(AI.Utils.GetLastChainCard()==check)
-                    {
-                        target = check;
-                        break;
-                    }
-                }
-                if(target!=null)
-                {
-                    AI.SelectCard(target);
-                    return true;
-                }
-            }
-            if(Bot.BattlingMonster!=null && Enemy.BattlingMonster!=null)
-            {
-                if (Enemy.BattlingMonster.Id == CardId.EaterOfMillions)
-                {
-                    AI.SelectCard(Enemy.BattlingMonster);
-                    return true;
-                }
-            }
-            return false;
-        }
-
+ 
         private bool HeavyStormDustereff()
         {
             IList<ClientCard> targets = new List<ClientCard>();
@@ -352,12 +293,12 @@ namespace WindBot.Game.AI.Decks
         private bool UpstartGoblineff()
         {
             AI.SelectPlace(Zones.z2, 2);
-            return !SpellWillBeNegated();
+            return !DefaultSpellWillBeNegated();
         }
 
         private bool PotOfDualityeff()
         {
-            if (SpellWillBeNegated())
+            if (DefaultSpellWillBeNegated())
                 return false;
             AI.SelectPlace(Zones.z2, 2);
             int count = 0;
@@ -412,13 +353,13 @@ namespace WindBot.Game.AI.Decks
         {
             if (CardOfDemiseeff_used) return false;
             AI.SelectPlace(Zones.z2, 2);
-            return Bot.Deck.Count > 14 && !SpellWillBeNegated();
+            return Bot.Deck.Count > 14 && !DefaultSpellWillBeNegated();
         }
 
         private bool CardOfDemiseeff()
         {
             AI.SelectPlace(Zones.z2, 2);
-            if (Bot.Hand.Count == 1 && Bot.GetSpellCountWithoutField() <= 3 && !SpellWillBeNegated())
+            if (Bot.Hand.Count == 1 && Bot.GetSpellCountWithoutField() <= 3 && !DefaultSpellWillBeNegated())
             {
                 CardOfDemiseeff_used = true;
                 return true;
@@ -431,7 +372,7 @@ namespace WindBot.Game.AI.Decks
             if(Card.Location==CardLocation.Hand)
             {
                 if (Bot.GetMonsterCount() == 0) return false;
-                return !SpellWillBeNegated();
+                return !DefaultSpellWillBeNegated();
             }
             if(Card.Location==CardLocation.Grave)
             {

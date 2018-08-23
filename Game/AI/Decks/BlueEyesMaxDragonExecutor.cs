@@ -50,7 +50,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.AshBlossom, DefaultAshBlossomAndJoyousSpring);
             AddExecutor(ExecutorType.Activate, CardId.MaxxC, MaxxCeff);
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence, DefaultInfiniteImpermanence);
-            AddExecutor(ExecutorType.Activate, CardId.CalledByTheGrave, CalledByTheGraveeff);
+            AddExecutor(ExecutorType.Activate, CardId.CalledByTheGrave, DefaultCalledByTheGrave);
             //first
             AddExecutor(ExecutorType.Activate, CardId.UpstartGoblin);           
             AddExecutor(ExecutorType.Activate, CardId.BlueEyesAlternativeWhiteDragon, BlueEyesAlternativeWhiteDragoneff);
@@ -124,41 +124,6 @@ namespace WindBot.Game.AI.Decks
             return Duel.Player == 1;
         }
 
-        private bool CalledByTheGraveeff()
-        {
-            if(Duel.LastChainPlayer==1)
-            {
-                if(AI.Utils.GetLastChainCard().Id==CardId.MaxxC)
-                {
-                    AI.SelectCard(CardId.MaxxC);
-                    if(AI.Utils.ChainContainsCard(CardId.TheMelodyOfAwakeningDragon))
-                        AI.SelectNextCard(new[] { CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesAlternativeWhiteDragon });
-                    return UniqueFaceupSpell();
-                }
-                if (AI.Utils.GetLastChainCard().Id == CardId.LockBird)
-                {
-                    AI.SelectCard(CardId.LockBird);
-                    if (AI.Utils.ChainContainsCard(CardId.TheMelodyOfAwakeningDragon))
-                        AI.SelectNextCard(new[] { CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesAlternativeWhiteDragon });
-                    return UniqueFaceupSpell();
-                }
-                if (AI.Utils.GetLastChainCard().Id == CardId.Ghost)
-                {
-                    AI.SelectCard(CardId.Ghost);
-                    if (AI.Utils.ChainContainsCard(CardId.TheMelodyOfAwakeningDragon))
-                        AI.SelectNextCard(new[] { CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesAlternativeWhiteDragon });
-                    return UniqueFaceupSpell();
-                }
-                if (AI.Utils.GetLastChainCard().Id == CardId.AshBlossom)
-                {
-                    AI.SelectCard(CardId.AshBlossom);
-                    if (AI.Utils.ChainContainsCard(CardId.TheMelodyOfAwakeningDragon))
-                        AI.SelectNextCard(new[] { CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesChaosMaxDragon, CardId.BlueEyesAlternativeWhiteDragon });
-                    return UniqueFaceupSpell();
-                }
-            }
-            return false;
-        }
         private bool BlueEyesAlternativeWhiteDragoneff()
         {
             if(Card.Location==CardLocation.Hand)
