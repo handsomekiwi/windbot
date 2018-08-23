@@ -28,6 +28,7 @@ namespace WindBot.Game
         private bool _debug;
         private bool _showbothand;
         private int _select_hint;
+        private GameMessage _lastMessage;
         private bool _spsummon = false;
         private bool equip_fresh = false;
         private bool equip_check = false;
@@ -76,6 +77,7 @@ namespace WindBot.Game
                 GameMessage msg = (GameMessage)packet.ReadByte();
                 if (_messages.ContainsKey(msg))
                     _messages[msg](packet);
+                _lastMessage = msg;
                 return;
             }
             if (_packets.ContainsKey(id))
@@ -331,7 +333,7 @@ namespace WindBot.Game
         {
             _ai.OnRetry();
             Connection.Close();
-            throw new Exception("Got MSG_RETRY.");
+            throw new Exception("Got MSG_RETRY. Last message is " + _lastMessage);
         }
 
         private void OnHint(BinaryReader packet)
@@ -1606,9 +1608,11 @@ namespace WindBot.Game
             {
                 result[index++] = 0;
             }
-            for (int i = 0; i < selected.Count; ++i)
+            int l = 0;
+            while (l < selected.Count)
             {
-                result[index++] = (byte)selected[i].SelectSeq;
+                result[index++] = (byte)selected[l].SelectSeq;
+                ++l;
             }
 
             BinaryWriter reply = GamePacketFactory.Create(CtosMessage.Response);

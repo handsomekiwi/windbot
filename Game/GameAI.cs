@@ -617,6 +617,12 @@ namespace WindBot.Game
             if (mode)
             {
                 // equal
+
+                if (sum == 0 && min == 0)
+                {
+                    return new List<ClientCard>();
+                }
+
                 if (min <= 1)
                 {
                     // try special level first
