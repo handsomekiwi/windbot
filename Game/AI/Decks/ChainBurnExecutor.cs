@@ -40,6 +40,7 @@ namespace WindBot.Game.AI.Decks
 
             public const int Linkuriboh = 41999284;
             public const int HarpiesFeatherDuster = 18144506;
+            public const int EaterOfMillions = 63845230;
         }
 
         public ChainBurnExecutor(GameAI ai, Duel duel)
@@ -742,11 +743,13 @@ namespace WindBot.Game.AI.Decks
             if (attacker.Id == CardId.SandaionTheTimelord && !attacker.IsDisabled())
             {
                 attacker.RealPower = 9999;
+                if (defender.Id == CardId.EaterOfMillions) return false;
                 return true;
             }
             if(attacker.Id==CardId.MichionTimelord && !attacker.IsDisabled())
             {
                 attacker.RealPower = 9999;
+                if (defender.Id == CardId.EaterOfMillions) return false;
                 return true;
             }
             return base.OnPreBattleBetween(attacker,defender);
