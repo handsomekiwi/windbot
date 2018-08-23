@@ -100,7 +100,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.EaterOfMillions, EaterOfMillionseff);
             //other
 
-            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, Scapegoateff);
+            AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
             AddExecutor(ExecutorType.SpellSet, CardId.SeaStealthAttack, NoSetAlreadyDone);
             AddExecutor(ExecutorType.SpellSet, CardId.StarlightRoad, StarlightRoadset);
             AddExecutor(ExecutorType.SpellSet, CardId.TheHugeRevolutionIsOver, TheHugeRevolutionIsOverset);
@@ -609,26 +609,7 @@ namespace WindBot.Game.AI.Decks
         private bool PotOfDesireseff()
         {
             return Bot.Deck.Count >= 18;
-        }
-
-        private bool Scapegoateff()
-        {
-            if (DefaultSpellWillBeNegated()) return false;
-            if (Duel.Player == 0) return false;
-            if (Duel.Phase == DuelPhase.End) return true;
-            if (DefaultOnBecomeTarget()) return true;
-            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
-            {
-                int total_atk = 0;
-                List<ClientCard> enemy_monster = Enemy.GetMonsters();
-                foreach (ClientCard m in enemy_monster)
-                {
-                    if (m.IsAttack()) total_atk += m.Attack;
-                }
-                if (total_atk >= Bot.LifePoints) return true;
-            }
-            return false;
-        }
+        }       
        
         private bool StarlightRoadset()
         {

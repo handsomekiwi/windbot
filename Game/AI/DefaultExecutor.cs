@@ -64,6 +64,7 @@ namespace WindBot.Game.AI
 
             public const int BlueEyesChaosMAXDragon = 55410871;
 
+            public const int CyberEmergency = 60600126;
             public const int EaterOfMillions = 63845230;
             public const int GoldenCastleOfStromberg = 72283691;
             public const int KnightmareGryphon = 65330383;
@@ -805,6 +806,29 @@ namespace WindBot.Game.AI
             AI.SelectCard(selected);
             return true;
         }
+
+        /// <summary>
+        /// Default Scapegoat effect
+        /// </summary>
+        protected bool DefaultScapegoat()
+        {
+            if (DefaultSpellWillBeNegated()) return false;
+            if (Duel.Player == 0) return false;
+            if (Duel.Phase == DuelPhase.End) return true;
+            if (DefaultOnBecomeTarget()) return true;
+            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
+            {
+                if (Enemy.HasInMonstersZone(_CardId.UltimateConductorTytanno, true)) return false;
+                int total_atk = 0;
+                List<ClientCard> enemy_monster = Enemy.GetMonsters();
+                foreach (ClientCard m in enemy_monster)
+                {
+                    if (m.IsAttack()) total_atk += m.Attack;
+                }
+                if (total_atk >= Bot.LifePoints) return true;
+            }
+            return false;
+        }
         /// <summary>
         /// Default MaxxC effect
         /// </summary>
@@ -821,6 +845,9 @@ namespace WindBot.Game.AI
                 return false;
             if (AI.Utils.GetLastChainCard().Id == _CardId.UpstartGoblin)
                 return false;
+            if (AI.Utils.GetLastChainCard().Id == _CardId.CyberEmergency)
+                return false;
+            if (AI.Utils.GetLastChainCard().Id == _CardId.GalaxySoldier && Enemy.Hand.Count >= 3) return false;
             return Duel.LastChainPlayer == 1;
         }
         /// <summary>
@@ -1242,24 +1269,7 @@ namespace WindBot.Game.AI
                 return true;
             return false;
         }
-        protected bool DefaultScapegoat()
-        {
-            if (DefaultSpellWillBeNegated()) return false;
-            if (Duel.Player == 0) return false;
-            if (Duel.Phase == DuelPhase.End) return true;
-            if (Duel.LastChainPlayer == 1 && DefaultOnBecomeTarget()) return true;
-            if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
-            {
-                int total_atk = 0;
-                List<ClientCard> enemy_monster = Enemy.GetMonsters();
-                foreach (ClientCard m in enemy_monster)
-                {
-                    if (m.IsAttack()) total_atk += m.Attack;
-                }
-                if (total_atk >= Bot.LifePoints) return true;
-            }
-            return false;
-        }
+        
         /// <summary>
         /// Draw when we have Dark monster in hand,and banish random one. Can be overrided.
         /// </summary>
