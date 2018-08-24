@@ -130,8 +130,10 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.Sharkcannon, Sharkcannoneff);
             AddExecutor(ExecutorType.Activate, CardId.WidowAnchor, WidowAnchorEffect);
             AddExecutor(ExecutorType.Activate, CardId.InfiniteImpermanence,InfiniteImpermanenceeff);            
-            AddExecutor(ExecutorType.Activate, CardId.TwinTwisters, TwinTwistersEffect);            
-                     
+            AddExecutor(ExecutorType.Activate, CardId.TwinTwisters, TwinTwistersEffect);
+
+            //To battle phase
+            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
             //first set
             AddExecutor(ExecutorType.SpellSet, CardId.HerculesBase, BaseSetFirst);
             AddExecutor(ExecutorType.Activate, CardId.NingirsuTheWorldChaliceWarrior, WarriorCleaneff);
@@ -214,9 +216,7 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.CrystronNeedlefiber, CrystronNeedlefiberEffect_B2);
             AddExecutor(ExecutorType.SpSummon, CardId.BrandishMaidenHayate, HayateSp_B2);
             AddExecutor(ExecutorType.SpSummon, CardId.BrandishMaidenShizuku, ShizukuSp_B2);
-
-            //To battle phase
-            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
+            
             //card control           
             AddExecutor(ExecutorType.Activate, CardId.AreaZero, AreaZeroEffect);
             AddExecutor(ExecutorType.Activate, CardId.BrandishMaidenRei, BrandishMaidenReiEffect);
