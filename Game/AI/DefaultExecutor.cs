@@ -89,6 +89,10 @@ namespace WindBot.Game.AI
 
             public const int BorrelswordDragon = 85289965;
             public const int PalladiumOracleMahad = 71703785;
+
+            public const int InvokedPurgatrio = 12307878;
+            public const int ChaosAncientGearGiant = 51788412;
+            public const int UltimateAncientGearGolem = 12652643;            
         }
         IList<ClientCard> EnemyAttackers = new List<ClientCard>();
         protected DefaultExecutor(GameAI ai, Duel duel)
@@ -334,10 +338,7 @@ namespace WindBot.Game.AI
         {
             if (Enemy.HasInSpellZone(_CardId.GoldenCastleOfStromberg, true))
                 return false;
-            if (Enemy.HasInSpellZone(_CardId.MoonMirrorShield, true) && defender.IsEquiped(_CardId.MoonMirrorShield))
-                defender.RealPower = (attacker.Attack > attacker.Defense ? attacker.Attack:attacker.Defense) + 100;
-            if (Bot.HasInSpellZone(_CardId.MoonMirrorShield, true) && attacker.IsEquiped(_CardId.MoonMirrorShield))
-                attacker.RealPower = (defender.Attack > defender.Defense ? defender.Attack : defender.Defense) + 100;
+          
             if (!attacker.IsMonsterHasPreventActivationEffectInBattle())
             {                
                 if(defender.Race==(int)CardRace.SpellCaster && defender.Attribute== (int)CardAttribute.Dark &&
@@ -351,7 +352,15 @@ namespace WindBot.Game.AI
                 {
                     defender.RealPower = attacker.Attack * 2;
                 }
-                
+
+                foreach (ClientCard equip in defender.EquipCards)
+                {
+                    if (equip.Id == _CardId.MoonMirrorShield && !equip.IsDisabled())
+                    {
+                        return false;
+                    }
+                }
+
                 if (defender.Id == _CardId.CrystalWingSynchroDragon && defender.IsAttack() && !defender.IsDisabled() && attacker.Level >= 5)
                     return false;
 
@@ -396,6 +405,14 @@ namespace WindBot.Game.AI
                 }
                 if (attacker.Id == _CardId.NumberS39UtopiaTheLightning && !attacker.IsDisabled() && attacker.HasXyzMaterial(2, _CardId.Number39Utopia))
                     attacker.RealPower = 5000;
+
+                foreach (ClientCard equip in attacker.EquipCards)
+                {
+                    if (equip.Id == _CardId.MoonMirrorShield && !equip.IsDisabled())
+                    {
+                        attacker.RealPower = defender.RealPower + 100;
+                    }
+                }
             }
 
             if (defender.IsMonsterInvincible() && defender.IsDefense())
@@ -819,6 +836,9 @@ namespace WindBot.Game.AI
             if (Duel.Phase > DuelPhase.Main1 && Duel.Phase < DuelPhase.Main2)
             {
                 if (Enemy.HasInMonstersZone(_CardId.UltimateConductorTytanno, true)) return false;
+                if (Enemy.HasInMonstersZone(_CardId.InvokedPurgatrio, true)) return false;
+                if (Enemy.HasInMonstersZone(_CardId.ChaosAncientGearGiant, true)) return false;
+                if (Enemy.HasInMonstersZone(_CardId.UltimateAncientGearGolem, true)) return false;
                 int total_atk = 0;
                 List<ClientCard> enemy_monster = Enemy.GetMonsters();
                 foreach (ClientCard m in enemy_monster)

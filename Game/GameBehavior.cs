@@ -29,20 +29,12 @@ namespace WindBot.Game
         private bool _showbothand;
         private int _select_hint;
         private GameMessage _lastMessage;
-        private bool _spsummon = false;
-        private bool equip_fresh = false;
-        private bool equip_check = false;
+        private bool _spsummon = false;       
         private int sp_seq = -1;
         private int sp_player = -1;
         private int sp_loc = -1;
         private bool ChainReplace = false;
-        private ClientCard ChainReplaceOld = null;
-        private ClientCard EquipMonster = null;
-        private ClientCard EquipCard = null;
-        private IList<ClientCard> EquipMonsterList = new List<ClientCard>();
-        private IList<ClientCard> EquipCardList = new List<ClientCard>();        
-        private int Equiped_player = -1;
-        private int Equip_Do_player = -1;
+        private ClientCard ChainReplaceOld = null;      
         public GameBehavior(GameClient game)
         {
             Game = game;
@@ -116,6 +108,7 @@ namespace WindBot.Game
             _messages.Add(GameMessage.Recover, OnRecover);
             _messages.Add(GameMessage.LpUpdate, OnLpUpdate);
             _messages.Add(GameMessage.Move, OnMove);
+            _messages.Add(GameMessage.Swap, OnSwap);
             _messages.Add(GameMessage.Attack, OnAttack);
             _messages.Add(GameMessage.PosChange, OnPosChange);
             _messages.Add(GameMessage.Chaining, OnChaining);
@@ -146,6 +139,8 @@ namespace WindBot.Game
             _messages.Add(GameMessage.AnnounceCardFilter, OnAnnounceCard);
             _messages.Add(GameMessage.RockPaperScissors, OnRockPaperScissors);
 
+            _messages.Add(GameMessage.Equip, OnEquip);
+            _messages.Add(GameMessage.Unequip, OnUnEquip);
             _messages.Add(GameMessage.SpSummoning, OnSpSummoning);
             _messages.Add(GameMessage.SpSummoned, OnSpSummoned);
         }
@@ -620,43 +615,10 @@ namespace WindBot.Game
             _duel.LastSummonMonster = null;
             _duel.refresh = true;
             _duel.Onattack = false;
-           /* if(EquipMonsterList.Count>0)
-            {
-                for (int j = 0; j < EquipMonsterList.Count; j++)
-                {
-                    ClientCard check = EquipMonsterList[j];
-                    Logger.DebugWriteLine(check.Name);
-                    Logger.DebugWriteLine(check.Name+check.Zone.ToString());
-                    Logger.DebugWriteLine(check.Name+check.Controller.ToString());
-                    if (cardId==check.Id && _duel.Fields[check.Controller].MonsterZone[previousSequence] == null)
-                    {
-                        for (int i = 0; i < check.EquipTarget.Count; i++)
-                            EquipCardList.Remove(check.EquipTarget[i]);
-                        EquipMonsterList.Remove(check);
-                    }
-                }
-            }
-            if(EquipCardList.Count>0)
-            {
-                for (int i = 0; i < EquipCardList.Count; i++)
-                {
-                    ClientCard check = EquipCardList[i];
-                    Logger.DebugWriteLine(check.Name + check.Zone);
-                    if (cardId == check.Id && _duel.Fields[check.Controller].SpellZone[previousSequence] == null)
-                    {
-                        check.EquipTarget[0].EquipTarget.Remove(check);
-                        EquipCardList.Remove(EquipCardList[i]);
-                    }
-                }
-            }*/
+         
             
             ClientCard card = _duel.GetCard(previousControler, (CardLocation)previousLocation, previousSequence);
-            equip_check = false;
-           /* if(previousLocation==(int)CardLocation.Hand && currentLocation==(int)CardLocation.SpellZone)
-            {
-                equip_check = true;
-                Logger.DebugWriteLine("equip_check" + equip_check);
-            }*/
+           
             if (_debug)
             {
                 if (card != null)
@@ -697,6 +659,27 @@ namespace WindBot.Game
                     _duel.AddCard((CardLocation)currentLocation, card, currentControler, currentSequence, currentPosition, cardId);
             }
             _ai.OnMove();
+        }
+
+        private void OnSwap(BinaryReader packet)
+        {
+            int cardId1 = packet.ReadInt32();
+            int controler1 = GetLocalPlayer(packet.ReadByte());
+            int location1 = packet.ReadByte();
+            int sequence1 = packet.ReadByte();
+            packet.ReadByte();
+            int cardId2 = packet.ReadInt32();
+            int controler2 = GetLocalPlayer(packet.ReadByte());
+            int location2 = packet.ReadByte();
+            int sequence2 = packet.ReadByte();
+            packet.ReadByte();
+            ClientCard card1 = _duel.GetCard(controler1, (CardLocation)location1, sequence1);
+            ClientCard card2 = _duel.GetCard(controler2, (CardLocation)location2, sequence2);
+            if (card1 == null || card2 == null) return;
+            _duel.RemoveCard((CardLocation)location1, card1, controler1, sequence1);
+            _duel.RemoveCard((CardLocation)location2, card2, controler2, sequence2);
+            _duel.AddCard((CardLocation)location2, card1, controler2, sequence2, card1.Position, cardId1);
+            _duel.AddCard((CardLocation)location1, card2, controler1, sequence1, card2.Position, cardId2);
         }
 
         private void OnAttack(BinaryReader packet)
@@ -759,15 +742,7 @@ namespace WindBot.Game
             int cc = GetLocalPlayer(packet.ReadByte());            
             
             if (_debug)
-                if (card != null) Logger.DebugWriteLine("(" + cc.ToString() + " 's " + (card.Name ?? "UnKnowCard") + " activate effect)");
-            if (card.HasType(CardType.Equip) && equip_check)
-            {                
-                equip_fresh = true;
-                Logger.DebugWriteLine("equip_fresh" + equip_fresh);
-                Equip_Do_player = cc;
-                EquipCard = card;
-                equip_check = false;
-            }
+                if (card != null) Logger.DebugWriteLine("(" + cc.ToString() + " 's " + (card.Name ?? "UnKnowCard") + " activate effect)");          
 
             ChainReplaceOld = card;
             if (ChainReplaceOld.Name == null && _duel.CurrentChain.Count > 0)
@@ -784,38 +759,7 @@ namespace WindBot.Game
         }
 
         private void OnChainEnd(BinaryReader packet)
-        {
-            if (equip_fresh)
-            {
-                if (_duel.Fields[Equip_Do_player].SpellZone != null)
-                {
-                    foreach (ClientCard card in _duel.Fields[Equip_Do_player].SpellZone)
-                    {
-                        if (card == EquipCard)
-                        {
-                            EquipCardList.Add(EquipCard);
-                            Logger.DebugWriteLine(EquipMonster.Name);
-                            card.EquipTarget.Add(EquipMonster);
-                            break;
-                        }
-                    }
-
-                    foreach (ClientCard card in _duel.Fields[Equiped_player].MonsterZone)
-                    {
-                        if (card == EquipMonster)                        {
-                           
-                            EquipMonsterList.Add(EquipMonster);
-                            card.EquipTarget.Add(EquipCard);
-                            break;
-                        }
-                    }
-                }
-                Equiped_player = -1;
-                Equip_Do_player = -1;
-                EquipMonster = null;
-                EquipCard = null;
-                equip_fresh = false;
-            }
+        {            
             _ai.OnChainEnd();
             _duel.LastChainPlayer = -1;
           // Logger.DebugWriteLine("OnChainEnd= " + _duel.CurrentChain[0].Name);
@@ -895,8 +839,7 @@ namespace WindBot.Game
             card.Update(packet, _duel);
             if (card.Location != CardLocation.SpellZone && card.Location != CardLocation.MonsterZone)
                 card.Zone = -1;
-                if (!card.HasType(CardType.Equip))
-                equip_check = false;
+               
             card.SpSummon = false;
             if (ChainReplace)
             {
@@ -1047,11 +990,7 @@ namespace WindBot.Game
                 /*int sseq = */packet.ReadByte();
                 ClientCard card = _duel.GetCard(player, (CardLocation)loc, seq);
                 if (card == null) continue;
-                if(equip_fresh)
-                {
-                    Equiped_player = player;
-                    EquipMonster = card;
-                }
+               
                 if (_debug)
                     Logger.DebugWriteLine("(" + (CardLocation)loc + " 's " + (card.Name ?? "UnKnowCard") + " become target)");
                 _duel.ChainTargets.Add(card);
@@ -1434,8 +1373,7 @@ namespace WindBot.Game
         }
 
         private void OnSelectPlace(BinaryReader packet)
-        {
-            equip_check = false;
+        {            
             //Logger.DebugWriteLine("OnSelectPlace");
             packet.ReadByte(); // player
             packet.ReadByte(); // min          
@@ -1703,6 +1641,41 @@ namespace WindBot.Game
             else
                 result = _ai.OnRockPaperScissors();
             Connection.Send(CtosMessage.Response, result);
+        }
+
+        private void OnEquip(BinaryReader packet)
+        {
+            int equipCardControler = GetLocalPlayer(packet.ReadByte());
+            int equipCardLocation = packet.ReadByte();
+            int equipCardSequence = packet.ReadSByte();
+            packet.ReadByte();
+            int targetCardControler = GetLocalPlayer(packet.ReadByte());
+            int targetCardLocation = packet.ReadByte();
+            int targetCardSequence = packet.ReadSByte();
+            packet.ReadByte();
+            ClientCard equipCard = _duel.GetCard(equipCardControler, (CardLocation)equipCardLocation, equipCardSequence);
+            ClientCard targetCard = _duel.GetCard(targetCardControler, (CardLocation)targetCardLocation, targetCardSequence);
+            if (equipCard == null || targetCard == null) return;
+            if (equipCard.EquipTarget != null)
+            {
+                equipCard.EquipTarget.EquipCards.Remove(equipCard);
+            }
+            equipCard.EquipTarget = targetCard;
+            targetCard.EquipCards.Add(equipCard);
+        }
+        private void OnUnEquip(BinaryReader packet)
+        {
+            int equipCardControler = GetLocalPlayer(packet.ReadByte());
+            int equipCardLocation = packet.ReadByte();
+            int equipCardSequence = packet.ReadSByte();
+            packet.ReadByte();
+            ClientCard equipCard = _duel.GetCard(equipCardControler, (CardLocation)equipCardLocation, equipCardSequence);
+            if (equipCard == null) return;
+            if (equipCard.EquipTarget != null)
+            {
+                equipCard.EquipTarget.EquipCards.Remove(equipCard);
+                equipCard.EquipTarget = null;
+            }
         }
 
         private void OnSpSummoning(BinaryReader packet)
