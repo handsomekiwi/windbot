@@ -44,9 +44,7 @@ namespace WindBot.Game
         public bool SpSummon { get; set; }
         public int[] ActionIndex { get; set; }
         public IDictionary<int, int> ActionActivateIndex { get; private set; }
-        //public ClientCard EquipTarget { get; set; }      
-        public IList<ClientCard> EquipTarget = new List<ClientCard>();
-        //public List<ClientCard> EquipTarget { get; set; }
+       
         public ClientCard(int id, CardLocation loc)
             : this(id, loc, -1, 0)
         {
@@ -227,16 +225,6 @@ namespace WindBot.Game
             if (!IsMonster())
                 return false;
             return SpSummon || IsExtraCard() || HasType(CardType.Ritual);
-        }        
-
-        public bool IsEquiped(int id)
-        {            
-            foreach(ClientCard check in EquipTarget)
-            {
-                if (check.Id == id)
-                    return true;
-            }
-            return false;
         }
 
         public bool HasXyzMaterial()
