@@ -62,6 +62,7 @@ namespace WindBot.Game.AI.Decks
 
             //chain
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
+            //AddExecutor(ExecutorType.Activate,CardId.DisciplesOfTheTrueDracophoenix, DisciplesOfTheTrueDracophoenixeff)
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracofighter, TheTrueDracofightereff);
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracocaster, TheTrueDracocastereff);
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracowarrior, TheTrueDracowarrioreff);
