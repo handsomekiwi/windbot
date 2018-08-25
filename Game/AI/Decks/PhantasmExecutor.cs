@@ -158,8 +158,8 @@ namespace WindBot.Game.AI.Decks
             {
                 AI.SelectCard(Enemy.BattlingMonster);
             }
-            if(Bot.GetMonsterCount()>0 && !Bot.HasInSpellZone(CardId.SeaStealthAttack) &&
-                AI.Utils.IsOneEnemyBetterThanValue(2000,true) && Duel.Phase==DuelPhase.BattleStart)
+            if (Bot.GetMonsterCount() > 0 && !Bot.HasInSpellZone(CardId.SeaStealthAttack) &&
+                AI.Utils.IsOneEnemyBetterThanValue(2000, false) && Duel.Phase==DuelPhase.BattleStart)
             {
                 AI.SelectCard(AI.Utils.GetBestEnemyMonster(true,true));
                 return UniqueFaceupSpell();
