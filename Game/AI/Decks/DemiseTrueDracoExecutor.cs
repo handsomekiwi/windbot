@@ -60,9 +60,14 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, _CardId.AshBlossom, DefaultAshBlossomAndJoyousSpring);
             AddExecutor(ExecutorType.Activate, _CardId.GhostOgreAndSnowRabbit, DefaultGhostOgreAndSnowRabbit);
 
+            //normal summon            
+            AddExecutor(ExecutorType.Summon, CardId.InspectorBoarder, InspectorBoardersummon);
             //chain
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
-            //AddExecutor(ExecutorType.Activate,CardId.DisciplesOfTheTrueDracophoenix, DisciplesOfTheTrueDracophoenixeff)
+            AddExecutor(ExecutorType.Activate, CardId.DisciplesOfTheTrueDracophoenix, DisciplesOfTheTrueDracophoenixeff);
+            AddExecutor(ExecutorType.Activate, CardId.DisciplesOfTheTrueDracophoenix,TheTrueSpellEffect);
+            AddExecutor(ExecutorType.Activate, CardId.TrueDracoHeritage, TrueDracoHeritageeff);
+            AddExecutor(ExecutorType.Activate, CardId.TrueDracoHeritage, TheTrueSpellEffect);
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracofighter, TheTrueDracofightereff);
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracocaster, TheTrueDracocastereff);
             AddExecutor(ExecutorType.Activate, CardId.TheTrueDracowarrior, TheTrueDracowarrioreff);
@@ -76,8 +81,8 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.MissusRadiant, MissusRadianteff);
             AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh);
             AddExecutor(ExecutorType.Activate, CardId.Linkuriboh);
-            //normal summon            
-            AddExecutor(ExecutorType.Summon, CardId.InspectorBoarder, InspectorBoardersummon);
+
+            //normal summon
             AddExecutor(ExecutorType.Summon, CardId.TheTrueDracombatant, TheTrueDracombatantsummon);
 
             //spell set
@@ -113,7 +118,71 @@ namespace WindBot.Game.AI.Decks
                 }
             }
             return false;
-        }       
+        }
+        
+        private ClientCard GetSummonTrueMonster()
+        {
+            return null;
+        }
+
+        private bool DisciplesOfTheTrueDracophoenixeff()
+        {
+            if(Card.Location==CardLocation.SpellZone)
+            {
+                if(ActivateDescription == AI.Utils.GetStringId(CardId.DisciplesOfTheTrueDracophoenix, 0))
+                {
+                    AI.SelectCard(new[]
+                    {
+                        CardId.TrueKingReturn,
+                        CardId.TheTrueDracofighter,
+                    });
+                    return true;
+                }
+                else
+                {
+                    if(GetSummonTrueMonster()!=null)
+                    {
+                        AI.SelectCard(GetSummonTrueMonster());
+                        return true;
+                    }                    
+                }
+            }
+            return false;
+        }
+
+        private bool TrueDracoHeritageeff()
+        {
+            if (Card.Location == CardLocation.SpellZone)
+            {
+                if (ActivateDescription == AI.Utils.GetStringId(CardId.TrueDracoHeritage, 0))
+                {                   
+                    return true;
+                }
+                else
+                {
+                    if (GetSummonTrueMonster() != null)
+                    {
+                        AI.SelectCard(GetSummonTrueMonster());
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private bool TheTrueSpellEffect()
+        {
+            if (Card.Location == CardLocation.Hand) return true;
+            if(Card.Location == CardLocation.Grave)
+            {
+                if(Enemy.GetSpellCount()>0)
+                {
+                    AI.SelectCard(AI.Utils.GetBestEnemySpell());
+                    return true;
+                }
+            }          
+            return false;
+        }
 
         private bool TheTrueDracofightereff()
         {
