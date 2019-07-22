@@ -7,12 +7,13 @@ namespace WindBot.Game.AI
         public int CardId { get; private set; }
         public ExecutorType Type { get; private set; }
         public Func<bool> Func { get; private set; }
-
-        public CardExecutor(ExecutorType type, int cardId, Func<bool> func)
+        public int? ComboIndex { get; private set; }
+        public CardExecutor(ExecutorType type, int cardId, Func<bool> func, int? comboIndex)
         {
             CardId = cardId;
             Type = type;
             Func = func;
+            ComboIndex = comboIndex;
         }
     }
 }

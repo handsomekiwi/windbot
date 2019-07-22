@@ -384,7 +384,7 @@ namespace WindBot.Game
         /// <returns>A new MainPhaseAction containing the action to do.</returns>
         public MainPhaseAction OnSelectIdleCmd(MainPhase main)
         {
-            Executor.SetMain(main);
+            Executor.SetMain(main);            
             foreach (CardExecutor exec in Executor.Executors)
             {
             	if (exec.Type == ExecutorType.GoToEndPhase && main.CanEndPhase && exec.Func()) // check if should enter end phase directly
@@ -399,30 +399,70 @@ namespace WindBot.Game
                 // NOTICE: GoToBattlePhase and GoToEndPhase has no "card" can be accessed to ShouldExecute(), so instead use exec.Func() to check ...
                 // enter end phase and enter battle pahse is in higher priority. 
 
+                
                 for (int i = 0; i < main.ActivableCards.Count; ++i)
                 {
                     ClientCard card = main.ActivableCards[i];
+                    //card activate success means something change on the field not shouldexecute
+                    if (!ShouldExecute(exec, card, ExecutorType.Activate) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.Activate, main.ActivableDescs[i]))
                     {
                         _dialogs.SendActivate(card.Name);
                         return new MainPhaseAction(MainPhaseAction.MainAction.Activate, card.ActionActivateIndex[main.ActivableDescs[i]]);
                     }
+
                 }
                 foreach (ClientCard card in main.MonsterSetableCards)
                 {
+                    if(!ShouldExecute(exec, card, ExecutorType.MonsterSet) && exec.ComboIndex != null)
+                    {
+                        foreach(CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.MonsterSet))
                     {
                         _dialogs.SendSetMonster();
                         return new MainPhaseAction(MainPhaseAction.MainAction.SetMonster, card.ActionIndex);
                     }
+                    
                 }
                 foreach (ClientCard card in main.ReposableCards)
                 {
+                    if (!ShouldExecute(exec, card, ExecutorType.Repos) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.Repos))
                         return new MainPhaseAction(MainPhaseAction.MainAction.Repos, card.ActionIndex);
                 }
                 foreach (ClientCard card in main.SpecialSummonableCards)
                 {
+                    if (!ShouldExecute(exec, card, ExecutorType.SpSummon) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.SpSummon))
                     {
                         _dialogs.SendSummon(card.Name);
@@ -431,11 +471,30 @@ namespace WindBot.Game
                 }
                 foreach (ClientCard card in main.SummonableCards)
                 {
+                    if (!ShouldExecute(exec, card, ExecutorType.Summon) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.Summon))
                     {
                         _dialogs.SendSummon(card.Name);
                         return new MainPhaseAction(MainPhaseAction.MainAction.Summon, card.ActionIndex);
                     }
+
+                    if (!ShouldExecute(exec, card, ExecutorType.SummonOrSet) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.SummonOrSet))
                     {
                         if (Executor.Util.IsAllEnemyBetter(true) && Executor.Util.IsAllEnemyBetterThanValue(card.Attack + 300, false) &&
@@ -450,6 +509,15 @@ namespace WindBot.Game
                 }                
                 foreach (ClientCard card in main.SpellSetableCards)
                 {
+                    if (!ShouldExecute(exec, card, ExecutorType.SpellSet) && exec.ComboIndex != null)
+                    {
+                        foreach (CardExecutor exec_1 in Executor.Executors)
+                        {
+                            if (exec_1.ComboIndex == exec.ComboIndex)
+                                Executor.Executors.Remove(exec_1);
+                        }
+                    }
+
                     if (ShouldExecute(exec, card, ExecutorType.SpellSet))
                         return new MainPhaseAction(MainPhaseAction.MainAction.SetSpell, card.ActionIndex);
                 }
@@ -1095,7 +1163,7 @@ namespace WindBot.Game
 
         private bool ShouldExecute(CardExecutor exec, ClientCard card, ExecutorType type, int desc = -1)
         {
-            Executor.SetCard(type, card, desc);
+            Executor.SetCard(type, card, desc);           
             return card != null &&
                    exec.Type == type &&
                    (exec.CardId == -1 || exec.CardId == card.Id) &&

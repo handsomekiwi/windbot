@@ -213,23 +213,27 @@ namespace WindBot.Game.AI
         /// </summary>
         public void AddExecutor(ExecutorType type, int cardId, Func<bool> func)
         {
-            Executors.Add(new CardExecutor(type, cardId, func));
+            Executors.Add(new CardExecutor(type, cardId, func, null));
         }
 
+        public void AddExecutor(ExecutorType type, int cardId, Func<bool> func, int comboIndex)
+        {
+            Executors.Add(new CardExecutor(type, cardId, func, comboIndex));           
+        }
         /// <summary>
         /// Do the action for the card if available.
         /// </summary>
         public void AddExecutor(ExecutorType type, int cardId)
         {
-            Executors.Add(new CardExecutor(type, cardId, null));
+            Executors.Add(new CardExecutor(type, cardId, null, null));
         }
-
+        
         /// <summary>
         /// Do the action for every card if func return true.
         /// </summary>
         public void AddExecutor(ExecutorType type, Func<bool> func)
         {
-            Executors.Add(new CardExecutor(type, -1, func));
+            Executors.Add(new CardExecutor(type, -1, func, null));
         }
 
         /// <summary>
@@ -237,7 +241,7 @@ namespace WindBot.Game.AI
         /// </summary>
         public void AddExecutor(ExecutorType type)
         {
-            Executors.Add(new CardExecutor(type, -1, DefaultNoExecutor));
+            Executors.Add(new CardExecutor(type, -1, DefaultNoExecutor, null));
         }
 
         private bool DefaultNoExecutor()
