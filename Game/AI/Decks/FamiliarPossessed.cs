@@ -6,67 +6,76 @@ using WindBot.Game.AI;
 
 namespace WindBot.Game.AI.Decks
 {
-    [Deck("GrenMajuThunderBoarder", "AI_GrenMajuThunderBoarder")]
-    public class GrenMajuThunderBoarderExecutor : DefaultExecutor
+    [Deck("FamiliarPossessed", "AI_FamiliarPossessed")]
+    public class FamiliarPossessedExecutor : DefaultExecutor
     {
         public class CardId
         {
-            public const int InspectBoarder = 15397015;
-            public const int ThunderKingRaiOh = 71564252;
-            public const int AshBlossomAndJoyousSpring =14558127;
-            public const int GhostReaperAndWinterCherries = 62015408;
+            public const int MetalSnake = 71197066;
+            public const int FamiliarPossessedHiita= 4376658;
+            public const int FamiliarPossessedWynn = 31764353;
+            public const int FairyTailSnow = 55623480;
+            public const int FairyTailLuna = 86937530;
+            public const int AshBlossomAndJoyousSpring = 14558127;
             public const int GrenMajuDaEizo = 36584821;
-            public const int MaxxC = 23434538;
-            public const int EaterOfMillions = 63845230;
-
             public const int HarpieFeatherDuster = 18144506;
             public const int PotOfDesires = 35261759;
+            public const int PotOfExtravagance = 49238328;
             public const int CardOfDemise = 59750328;
-            public const int UpstartGoblin = 70368879;
             public const int PotOfDuality = 98645731;
             public const int Scapegoat = 73915051;
-            public const int MoonMirrorShield = 19508728;
+            public const int PossessedAwakening = 62256492;
             public const int InfiniteImpermanence = 10045474;
             public const int WakingTheDragon = 10813327;
-            public const int EvenlyMatched = 15693423;
-            public const int HeavyStormDuster = 23924608;
-            public const int DrowningMirrorForce = 47475363;
-            public const int MacroCosmos = 30241314;
+            public const int Crackdown = 25704359;
             public const int AntiSpellFragrance = 58921041;
             public const int ImperialOrder = 61740673;
-            public const int PhatomKnightsSword = 61936647;
-            public const int UnendingNightmare= 69452756;
-            public const int SolemnWarning = 84749824;
-            public const int SolemStrike= 40605147;
+            public const int SkellDrain = 82732705;
+            public const int SolemStrike = 40605147;
             public const int SolemnJudgment = 41420027;
-            public const int DarkBribe = 77538567;
 
+
+            public const int NaturiaExterio = 99916754;
             public const int RaidraptorUltimateFalcon = 86221741;
-            public const int BorreloadDragon = 31833038;
-            public const int BirrelswordDragon = 85289965;
-            public const int FirewallDragon = 5043010;
+            public const int MekkKnightCrusadiaAvramax = 21887175;
+            public const int BorreloadDragon= 31833038;
+            public const int BorrelswordDragon = 85289965;
+            public const int SoldierOfChaos = 49202162;
             public const int NingirsuTheWorldChaliceWarrior = 30194529;
-            public const int TopologicTrisbaena = 72529749;
             public const int KnightmareUnicorn = 38342335;
             public const int KnightmarePhoenix = 2857636;
-            public const int HeavymetalfoesElectrumite= 24094258;
+            public const int WynnTheWindCharmerVerdant = 30674956;
+            public const int HiitaTheFireCharmerAblaze= 48815792;
             public const int KnightmareCerberus = 75452921;
-            public const int CrystronNeedlefiber = 50588353;
-            public const int MissusRadiant= 3987233;
-            public const int BrandishMaidenKagari= 63288573;
-            public const int LinkSpider = 98978921;
+            public const int SecurityDragon = 99111753;
             public const int Linkuriboh = 41999284;
 
-            public const int KnightmareGryphon = 65330383;
+         
+
+            //old
+            public const int InspectBoarder = 15397015;
+            public const int ThunderKingRaiOh = 71564252;            
+            public const int GhostReaperAndWinterCherries = 62015408;            
+            public const int MaxxC = 23434538;
+            public const int EaterOfMillions = 63845230;
+            public const int HeavyStormDuster = 23924608;            
+            public const int UpstartGoblin = 70368879;  
+            public const int MoonMirrorShield = 19508728;
+            public const int EvenlyMatched = 15693423;            
+            public const int DrowningMirrorForce = 47475363;
+            public const int MacroCosmos = 30241314;  
+            public const int PhatomKnightsSword = 61936647;
+            public const int UnendingNightmare = 69452756;
+            public const int SolemnWarning = 84749824;            
+            public const int DarkBribe = 77538567;
         }
 
-        public GrenMajuThunderBoarderExecutor(GameAI ai, Duel duel)
+        public FamiliarPossessedExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
         {
             AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
             AddExecutor(ExecutorType.Activate, CardId.EvenlyMatched, EvenlyMatchedeff);
-            //Sticker
-            AddExecutor(ExecutorType.Activate, CardId.MacroCosmos, MacroCosmoseff);
+            //Sticker           
             AddExecutor(ExecutorType.Activate, CardId.AntiSpellFragrance, AntiSpellFragranceeff);
             //counter
             AddExecutor(ExecutorType.Activate, CardId.AshBlossomAndJoyousSpring, DefaultAshBlossomAndJoyousSpring);
@@ -89,21 +98,18 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.PotOfDesires, PotOfDesireseff);
             AddExecutor(ExecutorType.Activate, CardId.CardOfDemise, CardOfDemiseeff);
             //sp
-            AddExecutor(ExecutorType.SpSummon, CardId.MissusRadiant, MissusRadiantsp);
-            AddExecutor(ExecutorType.Activate, CardId.MissusRadiant, MissusRadianteff);
+           
             AddExecutor(ExecutorType.Activate, CardId.Linkuriboh, Linkuriboheff);
             AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh, Linkuribohsp);
-            AddExecutor(ExecutorType.SpSummon, CardId.LinkSpider);
+
             AddExecutor(ExecutorType.SpSummon, CardId.BorreloadDragon, BorreloadDragonsp);
             AddExecutor(ExecutorType.Activate, CardId.BorreloadDragon, BorreloadDragoneff);            
-            AddExecutor(ExecutorType.Activate, CardId.EaterOfMillions, EaterOfMillionseff);
+            
             AddExecutor(ExecutorType.Activate, CardId.WakingTheDragon, WakingTheDragoneff);
             // normal summon
             AddExecutor(ExecutorType.Summon, CardId.InspectBoarder, InspectBoardersummon);
             AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);
-            AddExecutor(ExecutorType.Summon, CardId.ThunderKingRaiOh, ThunderKingRaiOhsummon);
-            AddExecutor(ExecutorType.SpSummon, CardId.BorreloadDragon, BorreloadDragonspsecond);
-            AddExecutor(ExecutorType.SpSummon, CardId.EaterOfMillions, EaterOfMillionssp);
+            AddExecutor(ExecutorType.Summon, CardId.ThunderKingRaiOh, ThunderKingRaiOhsummon);            
             //spell          
             AddExecutor(ExecutorType.Activate, CardId.MoonMirrorShield, MoonMirrorShieldeff);
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
@@ -113,35 +119,14 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.SpellSet, SpellSet);
         }
         bool CardOfDemiseeff_used = false;        
-        bool eater_eff = false;
+       
         public override void OnNewTurn()
-        {            
-            eater_eff = false;
+        {
             CardOfDemiseeff_used = false;
         }
 
         public override void OnNewPhase()
-        {
-            foreach (ClientCard check in Bot.GetMonsters())
-            {
-                if (check.HasType(CardType.Fusion) || check.HasType(CardType.Xyz) ||
-                    check.HasType(CardType.Synchro) || check.HasType(CardType.Link) ||
-                    check.HasType(CardType.Ritual))
-                {
-                    eater_eff = true;
-                    break;
-                }
-            }
-            foreach (ClientCard check in Enemy.GetMonsters())
-            {
-                if (check.HasType(CardType.Fusion) || check.HasType(CardType.Xyz) ||
-                    check.HasType(CardType.Synchro) || check.HasType(CardType.Link) ||
-                    check.HasType(CardType.Ritual))
-                {
-                    eater_eff = true;
-                    break;
-                }
-            }
+        {         
             base.OnNewPhase();
         }
 
@@ -430,12 +415,10 @@ namespace WindBot.Game.AI.Decks
 
         private bool BorreloadDragonsp()
         {
-            if (!Bot.HasInMonstersZone(CardId.MissusRadiant)) return false;
+          
             IList<ClientCard> material_list = new List<ClientCard>();
             foreach (ClientCard monster in Bot.GetMonsters())
-            {
-                if (monster.IsCode(CardId.MissusRadiant, CardId.LinkSpider, CardId.Linkuriboh))
-                    material_list.Add(monster);
+            {              
                 if (material_list.Count == 3) break;
             }
             if(material_list.Count>=3)
@@ -445,23 +428,7 @@ namespace WindBot.Game.AI.Decks
             }
             return false;
         }
-        private bool BorreloadDragonspsecond()
-        {
-            if (!Bot.HasInMonstersZone(CardId.MissusRadiant)) return false;
-            IList<ClientCard> material_list = new List<ClientCard>();
-            foreach (ClientCard monster in Bot.GetMonsters())
-            {
-                if (monster.IsCode(CardId.MissusRadiant, CardId.LinkSpider, CardId.Linkuriboh))
-                    material_list.Add(monster);
-                if (material_list.Count == 3) break;
-            }
-            if (material_list.Count >= 3)
-            {
-                AI.SelectMaterials(material_list);
-                return true;
-            }
-            return false;
-        }
+        
         public bool BorreloadDragoneff()
         {
             if (ActivateDescription == -1 && (Duel.Phase==DuelPhase.BattleStart||Duel.Phase==DuelPhase.End))
@@ -485,62 +452,8 @@ namespace WindBot.Game.AI.Decks
             return false;
         }
 
-        private bool EaterOfMillionssp()
-        {
-            if (Bot.MonsterZone[0] == null)
-                AI.SelectPlace(Zones.z0);
-            else
-                AI.SelectPlace(Zones.z4);
-            if (Enemy.HasInMonstersZone(CardId.KnightmareGryphon, true)) return false;
-            if (Bot.HasInMonstersZone(CardId.InspectBoarder) && !eater_eff) return false;           
-            if (Util.GetProblematicEnemyMonster() == null && Bot.ExtraDeck.Count < 5) return false;
-            if (Bot.GetMonstersInMainZone().Count >= 5) return false;
-            if (Util.IsTurn1OrMain2()) return false;
-            AI.SelectPosition(CardPosition.FaceUpAttack);
-            IList<ClientCard> targets = new List<ClientCard>();            
-            foreach (ClientCard e_c in Bot.ExtraDeck)
-            {                
-                targets.Add(e_c);                
-                if (targets.Count >= 5)
-                {
-                    AI.SelectCard(targets);
-                    /*AI.SelectCard(new[] {
-                        CardId.BingirsuTheWorldChaliceWarrior,
-                        CardId.TopologicTrisbaena,
-                        CardId.KnightmareCerberus,
-                        CardId.KnightmarePhoenix,
-                        CardId.KnightmareUnicorn,
-                        CardId.BrandishMaidenKagari,
-                        CardId.HeavymetalfoesElectrumite,
-                        CardId.CrystronNeedlefiber,
-                        CardId.FirewallDragon,
-                        CardId.BirrelswordDragon,
-                        CardId.RaidraptorUltimateFalcon,
-                    });*/
-                   
-                    AI.SelectPlace(Zones.z4 | Zones.z0);
-                    return true;
-                }
-            }
-            Logger.DebugWriteLine("*** Eater use up the extra deck.");
-            foreach (ClientCard s_c in Bot.GetSpells())
-            {
-                targets.Add(s_c);
-                if (targets.Count >= 5)
-                {
-                    AI.SelectCard(targets);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private bool EaterOfMillionseff()
-        {
-            if (Enemy.BattlingMonster.HasPosition(CardPosition.Attack) && (Bot.BattlingMonster.Attack - Enemy.BattlingMonster.GetDefensePower() >= Enemy.LifePoints)) return false;
-            
-            return true;
-        }
+ 
+      
 
         private bool WakingTheDragoneff()
         {
@@ -548,31 +461,9 @@ namespace WindBot.Game.AI.Decks
             return true;
         }
 
-        private bool MissusRadiantsp()
-        {                       
-            IList<ClientCard> material_list = new List<ClientCard>();
-            foreach (ClientCard monster in Bot.GetMonsters())
-            {
-                if (monster.HasAttribute(CardAttribute.Earth) && monster.Level==1 && !monster.IsCode(CardId.EaterOfMillions))
-                    material_list.Add(monster);
-                if (material_list.Count == 2) break;
-            }
-            if (material_list.Count < 2) return false;
-            if (Bot.HasInMonstersZone(CardId.MissusRadiant)) return false;
-            AI.SelectMaterials(material_list);
-            if (Bot.MonsterZone[0] == null && Bot.MonsterZone[2] == null && Bot.MonsterZone[5] == null)
-                AI.SelectPlace(Zones.z5);
-            else
-                AI.SelectPlace(Zones.z6);
-            return true;
-        }
+        
 
-        private bool MissusRadianteff()
-        {
-            AI.SelectCard(CardId.MaxxC, CardId.MissusRadiant);
-            return true;
-        }
-
+       
         private bool Linkuribohsp()
         {            
             foreach (ClientCard c in Bot.GetMonsters())
@@ -632,7 +523,7 @@ namespace WindBot.Game.AI.Decks
         }
         public override bool OnPreBattleBetween(ClientCard attacker, ClientCard defender)
         {
-            if (attacker.IsCode(_CardId.EaterOfMillions) && (Bot.HasInMonstersZone(CardId.InspectBoarder) && eater_eff) && !attacker.IsDisabled())
+            if (attacker.IsCode(_CardId.EaterOfMillions) && !attacker.IsDisabled())
             {
                 attacker.RealPower = 9999;
                 return true;
@@ -649,7 +540,7 @@ namespace WindBot.Game.AI.Decks
             for (int i = 0; i < attackers.Count; ++i)
             {
                 ClientCard attacker = attackers[i];
-                if (attacker.IsCode(CardId.BirrelswordDragon, CardId.EaterOfMillions)) return attacker;
+                if (attacker.IsCode(CardId.BorrelswordDragon, CardId.EaterOfMillions)) return attacker;
             }
             return null;
         }
