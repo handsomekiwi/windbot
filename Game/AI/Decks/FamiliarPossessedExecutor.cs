@@ -87,18 +87,16 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.HeavyStormDuster, HeavyStormDustereff);
             AddExecutor(ExecutorType.Activate, CardId.UnendingNightmare, UnendingNightmareeff);
             AddExecutor(ExecutorType.Activate, CardId.DarkBribe, DarkBribeeff);
-            AddExecutor(ExecutorType.Activate, CardId.ImperialOrder, ImperialOrdereff);
-            AddExecutor(ExecutorType.Activate, CardId.ThunderKingRaiOh, ThunderKingRaiOheff);
-            AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);
-            AddExecutor(ExecutorType.Activate, CardId.DrowningMirrorForce, DrowningMirrorForceeff);
-            //first do
-            AddExecutor(ExecutorType.Activate, CardId.UpstartGoblin, UpstartGoblineff);
+            AddExecutor(ExecutorType.Activate, CardId.ImperialOrder, ImperialOrdereff);     
+            AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);  
+            //first do            
             AddExecutor(ExecutorType.Activate, CardId.HarpieFeatherDuster, DefaultHarpiesFeatherDusterFirst);
+            AddExecutor(ExecutorType.Activate, CardId.PotOfExtravagance, PotOfExtravagance);
             AddExecutor(ExecutorType.Activate, CardId.PotOfDuality, PotOfDualityeff);
             AddExecutor(ExecutorType.Activate, CardId.PotOfDesires, PotOfDesireseff);
             AddExecutor(ExecutorType.Activate, CardId.CardOfDemise, CardOfDemiseeff);
             //sp
-           
+            
             AddExecutor(ExecutorType.Activate, CardId.Linkuriboh, Linkuriboheff);
             AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh, Linkuribohsp);
 
@@ -106,12 +104,11 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.BorreloadDragon, BorreloadDragoneff);            
             
             AddExecutor(ExecutorType.Activate, CardId.WakingTheDragon, WakingTheDragoneff);
-            // normal summon
-            AddExecutor(ExecutorType.Summon, CardId.InspectBoarder, InspectBoardersummon);
-            AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);
-            AddExecutor(ExecutorType.Summon, CardId.ThunderKingRaiOh, ThunderKingRaiOhsummon);            
+            // normal summon 
+            AddExecutor(ExecutorType.Summon, MonsterSummon);
+            AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);                
             //spell          
-            AddExecutor(ExecutorType.Activate, CardId.MoonMirrorShield, MoonMirrorShieldeff);
+       
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
             AddExecutor(ExecutorType.Activate, CardId.PhatomKnightsSword, PhatomKnightsSwordeff);
             AddExecutor(ExecutorType.Repos, MonsterRepos);
@@ -136,8 +133,7 @@ namespace WindBot.Game.AI.Decks
         }
  
         private bool MacroCosmoseff()
-        {
-           
+        {           
             return (Duel.LastChainPlayer == 1 || Duel.LastSummonPlayer == 1 || Duel.Player == 0) && UniqueFaceupSpell();
         }
 
@@ -262,22 +258,18 @@ namespace WindBot.Game.AI.Decks
             }
             return false;
         }
-        private bool DrowningMirrorForceeff()
-        {
-            if(Enemy.GetMonsterCount() ==1)
-            {
-                if(Enemy.BattlingMonster.Attack-Bot.LifePoints>=1000)
-                    return DefaultUniqueTrap();
-            }
-            if (Util.GetTotalAttackingMonsterAttack(1) >= Bot.LifePoints)
-                return DefaultUniqueTrap();
-            if (Enemy.GetMonsterCount() >= 2)
-                return DefaultUniqueTrap();
-            return false;
-        }
+        
         private bool UpstartGoblineff()
         {         
             return !DefaultSpellWillBeNegated();
+        }
+
+        private bool PotOfExtravagance()
+        {
+            if (DefaultSpellWillBeNegated())
+                return false;
+            AI.SelectOption(1);
+            return true;
         }
 
         private bool PotOfDualityeff()
@@ -343,21 +335,7 @@ namespace WindBot.Game.AI.Decks
                 return true;
             }
             return false;
-        }
-
-        private bool MoonMirrorShieldeff()
-        {
-            if(Card.Location==CardLocation.Hand)
-            {
-                if (Bot.GetMonsterCount() == 0) return false;
-                return !DefaultSpellWillBeNegated();
-            }
-            if(Card.Location==CardLocation.Grave)
-            {
-                return true;
-            }
-            return false;
-        }
+        }        
 
         private bool PhatomKnightsSwordeff()
         {
@@ -373,14 +351,12 @@ namespace WindBot.Game.AI.Decks
             }
             return false;
         }
-        private bool InspectBoardersummon()
-        {           
-            if (Bot.MonsterZone[0] == null)
-                AI.SelectPlace(Zones.z0);
-            else
-                AI.SelectPlace(Zones.z4);
-            return true;
+        
+        private bool MonsterSummon()
+        {
+            return false;
         }
+
         private bool GrenMajuDaEizosummon()
         {
             if (Duel.Turn == 1) return false;           
@@ -389,29 +365,7 @@ namespace WindBot.Game.AI.Decks
             else
                 AI.SelectPlace(Zones.z4);
             return Bot.Banished.Count >= 6;
-        }
-
-        private bool ThunderKingRaiOhsummon()
-        { 
-            if (Bot.MonsterZone[0] == null)
-                AI.SelectPlace(Zones.z0);
-            else
-                AI.SelectPlace(Zones.z4);
-            return true;
-        }
-
-        private bool ThunderKingRaiOheff()
-        {
-           if(Duel.SummoningCards.Count > 0)
-           {
-                foreach(ClientCard m in Duel.SummoningCards)
-                {
-                    if (m.Attack >= 1900)
-                        return true;
-                }
-           }            
-            return false;
-        }
+        }            
 
         private bool BorreloadDragonsp()
         {
@@ -457,7 +411,7 @@ namespace WindBot.Game.AI.Decks
 
         private bool WakingTheDragoneff()
         {
-            AI.SelectCard(new[] { CardId.RaidraptorUltimateFalcon });
+            AI.SelectCard(new[] { CardId.RaidraptorUltimateFalcon,CardId.NaturiaExterio});
             return true;
         }
 
