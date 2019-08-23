@@ -106,9 +106,9 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.WakingTheDragon, WakingTheDragoneff);
             // normal summon 
             AddExecutor(ExecutorType.Summon, MonsterSummon);
-            AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);                
+            AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);
             //spell          
-       
+            AddExecutor(ExecutorType.Activate, CardId.Crackdown, Crackdowneff);
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
             AddExecutor(ExecutorType.Activate, CardId.PhatomKnightsSword, PhatomKnightsSwordeff);
             AddExecutor(ExecutorType.Repos, MonsterRepos);
@@ -365,7 +365,17 @@ namespace WindBot.Game.AI.Decks
             else
                 AI.SelectPlace(Zones.z4);
             return Bot.Banished.Count >= 6;
-        }            
+        }
+
+        private bool Crackdowneff()
+        {
+            if (Util.GetOneEnemyBetterThanMyBest(true, true) != null && Bot.UnderAttack)
+            {
+                AI.SelectCard(Util.GetOneEnemyBetterThanMyBest(true, true));
+                return true;
+            }           
+            return false;
+        }
 
         private bool BorreloadDragonsp()
         {
