@@ -112,6 +112,8 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.Scapegoat, DefaultScapegoat);
             AddExecutor(ExecutorType.Activate, CardId.PhatomKnightsSword, PhatomKnightsSwordeff);
             AddExecutor(ExecutorType.Repos, MonsterRepos);
+            AddExecutor(ExecutorType.Activate, CardId.MetalSnake, MetalSnakesp);
+            AddExecutor(ExecutorType.Activate, CardId.MetalSnake, MetalSnakeeff);
             //set
             AddExecutor(ExecutorType.SpellSet, SpellSet);
         }
@@ -376,7 +378,34 @@ namespace WindBot.Game.AI.Decks
             }           
             return false;
         }
+        private bool MetalSnakesp()
+        {
+            if (ActivateDescription == Util.GetStringId(CardId.MetalSnake, 0) && !Bot.HasInMonstersZone(CardId.MetalSnake))
+            {
+                if (Duel.Player == 1 && Duel.Phase >= DuelPhase.BattleStart)
+                    return Bot.Deck.Count >= 12;
+                if (Duel.Player == 0 && Duel.Phase >= DuelPhase.Main1)
+                    return Bot.Deck.Count >= 12;
+            }
+            return false;
+        }
 
+        private bool MetalSnakeeff()
+        {
+            ClientCard target = Util.GetOneEnemyBetterThanMyBest(true, true);
+            if (ActivateDescription == Util.GetStringId(CardId.MetalSnake, 1) && target != null)
+            {
+                AI.SelectCard(new[]
+                {
+                    CardId.RaidraptorUltimateFalcon,
+                    CardId.NingirsuTheWorldChaliceWarrior
+                });
+                AI.SelectNextCard(target);
+                return true;
+            }
+            return false;
+
+        }
         private bool BorreloadDragonsp()
         {
           
