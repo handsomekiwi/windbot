@@ -73,8 +73,7 @@ namespace WindBot.Game.AI.Decks
         public FamiliarPossessedExecutor(GameAI ai, Duel duel)
             : base(ai, duel)
         {
-            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);
-            AddExecutor(ExecutorType.Activate, CardId.EvenlyMatched, EvenlyMatchedeff);
+            AddExecutor(ExecutorType.GoToBattlePhase, GoToBattlePhase);           
             //Sticker           
             AddExecutor(ExecutorType.Activate, CardId.AntiSpellFragrance, AntiSpellFragranceeff);
             //counter
@@ -88,23 +87,28 @@ namespace WindBot.Game.AI.Decks
             AddExecutor(ExecutorType.Activate, CardId.UnendingNightmare, UnendingNightmareeff);
             AddExecutor(ExecutorType.Activate, CardId.DarkBribe, DarkBribeeff);
             AddExecutor(ExecutorType.Activate, CardId.ImperialOrder, ImperialOrdereff);     
-            AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);  
-            //first do            
-            AddExecutor(ExecutorType.Activate, CardId.HarpieFeatherDuster, DefaultHarpiesFeatherDusterFirst);
+            AddExecutor(ExecutorType.Activate, CardId.SolemnJudgment, DefaultSolemnJudgment);
+            //first do 
             AddExecutor(ExecutorType.Activate, CardId.PotOfExtravagance, PotOfExtravagance);
+            AddExecutor(ExecutorType.Activate, CardId.HarpieFeatherDuster, DefaultHarpiesFeatherDusterFirst);
+            AddExecutor(ExecutorType.Activate, CardId.PossessedAwakening);
             AddExecutor(ExecutorType.Activate, CardId.PotOfDuality, PotOfDualityeff);
             AddExecutor(ExecutorType.Activate, CardId.PotOfDesires, PotOfDesireseff);
             AddExecutor(ExecutorType.Activate, CardId.CardOfDemise, CardOfDemiseeff);
             //sp
-            
-            AddExecutor(ExecutorType.Activate, CardId.Linkuriboh, Linkuriboheff);
-            AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh, Linkuribohsp);
 
-            AddExecutor(ExecutorType.SpSummon, CardId.BorreloadDragon, BorreloadDragonsp);
-            AddExecutor(ExecutorType.Activate, CardId.BorreloadDragon, BorreloadDragoneff);            
+
+            AddExecutor(ExecutorType.Activate, DefaultCheckKnight);
+            AddExecutor(ExecutorType.SpSummon, CardId.KnightmareCerberus, DefaultKnightmareCerberus);
+            AddExecutor(ExecutorType.SpSummon, CardId.Linkuriboh, Linkuribohsp);
             
+            AddExecutor(ExecutorType.SpSummon, CardId.BorreloadDragon, BorreloadDragonsp);
+            AddExecutor(ExecutorType.Activate, CardId.BorreloadDragon, BorreloadDragoneff);
+
+            AddExecutor(ExecutorType.Activate, CardId.Linkuriboh, Linkuriboheff);
             AddExecutor(ExecutorType.Activate, CardId.WakingTheDragon, WakingTheDragoneff);
             // normal summon 
+            AddExecutor(ExecutorType.Activate, CardId.FairyTailLuna, FairyTailLunaeff);
             AddExecutor(ExecutorType.Summon, MonsterSummon);
             AddExecutor(ExecutorType.Summon, CardId.GrenMajuDaEizo, GrenMajuDaEizosummon);
             //spell          
@@ -117,15 +121,18 @@ namespace WindBot.Game.AI.Decks
             //set
             AddExecutor(ExecutorType.SpellSet, SpellSet);
         }
-        bool CardOfDemiseeff_used = false;        
-       
+        bool CardOfDemiseeff_used = false;
+        bool Dog_summon = false;
+        bool Phoenix_summon = false;
         public override void OnNewTurn()
         {
             CardOfDemiseeff_used = false;
         }
 
         public override void OnNewPhase()
-        {         
+        {
+            Dog_summon = false;
+            Phoenix_summon = false;
             base.OnNewPhase();
         }
 
@@ -454,9 +461,44 @@ namespace WindBot.Game.AI.Decks
             return true;
         }
 
-        
+        private bool FairyTailLunaeff()
+        {
+            if (ActivateDescription == Util.GetStringId(CardId.MetalSnake, 0))
+                return true;
+            if (ActivateDescription == Util.GetStringId(CardId.MetalSnake, 1))
+            {
+                if (Card.IsAttack())
+                    return true;
+            }
+            return false;
+        }
 
-       
+        private bool DefaultCheckKnight()
+        {
+            if (Duel.Player == 1) return false;
+            int level_1_count = 0;
+            int count = 0;
+            foreach (ClientCard c in Bot.GetMonsters())
+            {
+                if (c.Level == 1)
+                    level_1_count++;
+                else
+                    count++;
+            }
+            if (!(level_1_count >= 2 && count > 0)) return false;
+            if (Enemy.GetSpellCount() > 0)
+                Phoenix_summon = true;
+            else
+                Dog_summon = true;
+            return false;
+        }
+
+        private bool DefaultKnightmareCerberus()
+        {
+            if (!Dog_summon) return false;
+
+        }
+
         private bool Linkuribohsp()
         {            
             foreach (ClientCard c in Bot.GetMonsters())
